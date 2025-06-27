@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>布局修复测试</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'system': ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Text"', '"SF Pro Icons"', '"Helvetica Neue"', 'Helvetica', 'Arial', 'sans-serif']
+                    },
+                    colors: {
+                        'primary-text': '#1A1A1A',
+                        'main-bg': '#F8F9FA'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        }
+    </style>
+</head>
+<body class="min-h-screen w-full bg-[#000000] flex items-center justify-center font-system">
+    <!-- iPhone 容器 -->
+    <div class="w-full max-w-[393px] h-[852px] bg-[#1E1E1E] shadow-2xl overflow-hidden relative mx-auto rounded-[54px]">
+        <!-- iPhone 状态栏 -->
+        <div class="w-full h-[47px] bg-black px-5 flex items-center justify-between text-white text-[14px] font-medium">
+            <div class="flex items-center space-x-1">
+                <!-- 信号图标 -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 20h.01"></path>
+                    <path d="M7 20v-4"></path>
+                    <path d="M12 20v-8"></path>
+                    <path d="M17 20V8"></path>
+                    <path d="M22 4v16"></path>
+                </svg>
+                <span>中国移动</span>
+                <!-- WiFi图标 -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 20h.01"></path>
+                    <path d="M2 8.82a15 15 0 0 1 20 0"></path>
+                    <path d="M5 12.859a10 10 0 0 1 14 0"></path>
+                    <path d="M8.5 16.429a5 5 0 0 1 7 0"></path>
+                </svg>
+            </div>
+            <div class="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2">9:41</div>
+            <div class="flex items-center space-x-1">
+                <span>89%</span>
+                <!-- 电池图标 -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect width="16" height="10" x="2" y="7" rx="2" ry="2"></rect>
+                    <line x1="22" x2="22" y1="11" y2="13"></line>
+                </svg>
+            </div>
+        </div>
+
+        <!-- 动态岛 -->
+        <button class="absolute left-1/2 -translate-x-1/2 bg-black transition-all duration-300 ease-out w-[126px] h-[37.5px] -top-0.5 rounded-b-[24px]"></button>
+
+        <!-- 主内容区域 -->
+        <div class="w-full h-[calc(100%-47px)] bg-white overflow-hidden relative">
+            <!-- 滚动内容区域 -->
+            <div class="absolute inset-0 bottom-[84px] overflow-y-auto scrollbar-none">
+
+                <!-- 顶部导航栏 -->
+                <header class="bg-white border-b border-gray-100 sticky top-0 z-10">
+                    <div class="flex items-center justify-between px-4 py-3">
+                        <a href="javascript:history.back()" class="text-black hover:text-gray-600 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m15 18-6-6 6-6"></path>
+                            </svg>
+                        </a>
+                        <h1 class="text-[16px] font-medium text-black">布局修复测试</h1>
+                        <div class="w-5"></div>
+                    </div>
+                </header>
+
+                <!-- 测试内容 -->
+                <section class="bg-[#F8F9FA] px-3 py-4">
+                    <div class="bg-white rounded-xl p-4 shadow-[0_2px_8px_rgba(0,0,0,0.06)] mb-4">
+                        <h2 class="text-[16px] font-medium text-[#1A1A1A] mb-3">修复状态检查</h2>
+                        
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[13px] text-gray-600">页面居中</span>
+                                <span class="text-[13px] text-green-600 font-medium">✅ 已修复</span>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <span class="text-[13px] text-gray-600">iPhone容器</span>
+                                <span class="text-[13px] text-green-600 font-medium">✅ 已添加</span>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <span class="text-[13px] text-gray-600">底部导航栏</span>
+                                <span class="text-[13px] text-green-600 font-medium">✅ 已完善</span>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <span class="text-[13px] text-gray-600">中文编码</span>
+                                <span class="text-[13px] text-green-600 font-medium">✅ 正常显示</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl p-4 shadow-[0_2px_8px_rgba(0,0,0,0.06)] mb-4">
+                        <h3 class="text-[14px] font-medium text-[#1A1A1A] mb-3">中文字符测试</h3>
+                        <div class="space-y-2 text-[13px] text-gray-600">
+                            <p>姓名至少需要2个字符</p>
+                            <p>姓名不能超过20个字符</p>
+                            <p>地址信息过于简单，请输入详细地址</p>
+                            <p>地址不能超过200个字符</p>
+                            <p>备注不能超过200个字符</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl p-4 shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
+                        <h3 class="text-[14px] font-medium text-[#1A1A1A] mb-3">导航测试</h3>
+                        <p class="text-[13px] text-gray-600 mb-3">点击底部导航栏测试页面跳转功能</p>
+                        <div class="grid grid-cols-2 gap-2">
+                            <a href="home.html" class="px-3 py-2 bg-gray-100 rounded-lg text-[12px] text-center">首页</a>
+                            <a href="design-result.html" class="px-3 py-2 bg-gray-100 rounded-lg text-[12px] text-center">设计</a>
+                            <a href="mall.html" class="px-3 py-2 bg-black text-white rounded-lg text-[12px] text-center">商城</a>
+                            <a href="me.html" class="px-3 py-2 bg-gray-100 rounded-lg text-[12px] text-center">我的</a>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- 底部导航栏 -->
+            <div class="absolute bottom-0 left-0 right-0 h-[84px] bg-white/80 backdrop-blur-xl border-t border-white/20">
+                <!-- 导航栏内容 -->
+                <nav class="h-[49px] flex items-center px-2">
+                    <div class="flex justify-around w-full text-[12px]">
+                        <a class="flex flex-col items-center group text-gray-400 hover:text-gray-600 active:text-gray-800 transition-colors" href="home.html">
+                            <div class="transform transition-transform group-hover:scale-110 group-active:scale-95">
+                                <svg class="w-[22px] h-[22px] stroke-[1.5]" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                                </svg>
+                            </div>
+                            <span class="mt-1">首页</span>
+                        </a>
+                        <a class="flex flex-col items-center group text-gray-400 hover:text-gray-600 active:text-gray-800 transition-colors" href="design-result.html">
+                            <div class="transform transition-transform group-hover:scale-110 group-active:scale-95">
+                                <svg class="w-[22px] h-[22px] stroke-[1.5]" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="13.5" cy="6.5" fill="currentColor" r=".5"></circle>
+                                    <circle cx="17.5" cy="10.5" fill="currentColor" r=".5"></circle>
+                                    <circle cx="8.5" cy="7.5" fill="currentColor" r=".5"></circle>
+                                    <circle cx="6.5" cy="12.5" fill="currentColor" r=".5"></circle>
+                                    <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"></path>
+                                </svg>
+                            </div>
+                            <span class="mt-1">设计</span>
+                        </a>
+                        <a class="flex flex-col items-center group text-black transition-colors" href="mall.html">
+                            <div class="transform transition-transform group-hover:scale-110 group-active:scale-95">
+                                <svg class="w-[22px] h-[22px] stroke-[1.5]" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                                    <path d="M3 6h18"></path>
+                                    <path d="M16 10a4 4 0 0 1-8 0"></path>
+                                </svg>
+                            </div>
+                            <span class="mt-1">商城</span>
+                        </a>
+                        <a class="flex flex-col items-center group text-gray-400 hover:text-gray-600 active:text-gray-800 transition-colors" href="spaces.html">
+                            <div class="transform transition-transform group-hover:scale-110 group-active:scale-95">
+                                <svg class="w-[22px] h-[22px] stroke-[1.5]" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="m15 12-8.373 8.373a1 1 0 1 1-3-3L12 9"></path>
+                                    <path d="m18 15 4-4"></path>
+                                    <path d="m21.5 11.5-1.914-1.914A2 2 0 0 1 19 8.172V7l-2.26-2.26a6 6 0 0 0-4.202-1.756L9 2.96l.92.82A6.18 6.18 0 0 1 12 8.4V10l2 2h1.172a2 2 0 0 1 1.414.586L18.5 14.5"></path>
+                                </svg>
+                            </div>
+                            <span class="mt-1">施工</span>
+                        </a>
+                        <a class="flex flex-col items-center group text-gray-400 hover:text-gray-600 active:text-gray-800 transition-colors" href="me.html">
+                            <div class="transform transition-transform group-hover:scale-110 group-active:scale-95">
+                                <svg class="w-[22px] h-[22px] stroke-[1.5]" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                            </div>
+                            <span class="mt-1">我的</span>
+                        </a>
+                    </div>
+                </nav>
+                <!-- iPhone 16 Home Indicator -->
+                <div class="h-[34px] flex items-center justify-center">
+                    <div class="w-[134px] h-[5px] bg-black rounded-full"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

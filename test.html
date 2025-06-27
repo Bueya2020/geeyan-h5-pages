@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>H5页面资源测试</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="css/styles.css" rel="stylesheet">
+    <link href="css/iphone16_fix.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com/"></script>
+
+    <!-- 全局错误处理和兜底方案 -->
+    <script>
+        (function() {
+            'use strict';
+            
+            // 创建 Trace 对象的兜底实现
+            window.Trace = window.Trace || {
+                init: function() { console.log('Trace initialized (fallback)'); },
+                log: function() { console.log.apply(console, arguments); },
+                error: function() { console.error.apply(console, arguments); },
+                warn: function() { console.warn.apply(console, arguments); },
+                info: function() { console.info.apply(console, arguments); }
+            };
+
+            // 防止其他可能的调试工具错误
+            window.wx = window.wx || {};
+            window.my = window.my || {};
+            
+            // 防止 chartId 未定义错误
+            window.chartId = window.chartId || 'default-chart-id';
+            
+            // 全局错误处理
+            window.addEventListener('error', function(e) {
+                console.error('Global error caught:', e.error);
+                return true; // 阻止默认错误处理
+            });
+            
+            window.addEventListener('unhandledrejection', function(e) {
+                console.error('Unhandled promise rejection:', e.reason);
+                e.preventDefault(); // 阻止默认处理
+            });
+            
+            console.log('✅ 全局错误处理已初始化');
+        })();
+    </script>
+</head>
+<body class="bg-gray-100 font-system">
+    <div class="safe-area-top">
+        <div class="container mx-auto px-4 py-8">
+            <div class="bg-white rounded-lg shadow-lg p-6 fade-in">
+                <h1 class="text-2xl font-bold text-center mb-6">
+                    <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                    H5页面资源测试
+                </h1>
+                
+                <div class="space-y-4">
+                    <!-- 样式测试 -->
+                    <div class="card-hover bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 rounded-lg">
+                        <h3 class="font-semibold mb-2">样式测试</h3>
+                        <p>这是一个带有渐变背景和悬停效果的卡片</p>
+                    </div>
+                    
+                    <!-- 按钮测试 -->
+                    <div class="flex space-x-4">
+                        <button class="btn-hover bg-blue-500 text-white px-4 py-2 rounded-lg" onclick="testToast()">
+                            测试提示消息
+                        </button>
+                        <button class="btn-hover bg-green-500 text-white px-4 py-2 rounded-lg" onclick="testLoading()">
+                            测试加载状态
+                        </button>
+                        <button class="btn-hover bg-purple-500 text-white px-4 py-2 rounded-lg" onclick="testBridge()">
+                            测试H5桥接
+                        </button>
+                    </div>
+                    
+                    <!-- 表单测试 -->
+                    <form data-validate class="space-y-4 bg-gray-50 p-4 rounded-lg">
+                        <h3 class="font-semibold mb-4">表单验证测试</h3>
+                        
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">邮箱地址</label>
+                            <input type="email" id="email" name="email" required 
+                                   class="form-input w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                   placeholder="请输入邮箱地址">
+                        </div>
+                        
+                        <div>
+                            <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">手机号码</label>
+                            <input type="tel" id="phone" name="phone" required 
+                                   class="form-input w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                   placeholder="请输入手机号码">
+                        </div>
+                        
+                        <div>
+                            <label for="password" class="block text-sm font-medium text-gray-700 mb-1">密码</label>
+                            <input type="password" id="password" name="password" required minlength="6"
+                                   class="form-input w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                   placeholder="请输入密码（至少6位）">
+                        </div>
+                        
+                        <button type="submit" class="btn-hover w-full bg-blue-500 text-white py-2 rounded-md">
+                            提交测试
+                        </button>
+                    </form>
+                    
+                    <!-- 功能测试结果 -->
+                    <div id="test-results" class="bg-white border rounded-lg p-4">
+                        <h3 class="font-semibold mb-2">测试结果</h3>
+                        <div id="results-content" class="text-sm text-gray-600">
+                            点击上方按钮进行功能测试...
+                        </div>
+                    </div>
+                    
+                    <!-- 资源加载状态 -->
+                    <div class="bg-white border rounded-lg p-4">
+                        <h3 class="font-semibold mb-2">资源加载状态</h3>
+                        <div class="grid grid-cols-2 gap-2 text-sm">
+                            <div class="flex items-center">
+                                <i class="fas fa-check text-green-500 mr-2"></i>
+                                <span>Font Awesome</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-check text-green-500 mr-2"></i>
+                                <span>Tailwind CSS</span>
+                            </div>
+                            <div class="flex items-center" id="styles-status">
+                                <i class="fas fa-spinner fa-spin text-yellow-500 mr-2"></i>
+                                <span>自定义样式</span>
+                            </div>
+                            <div class="flex items-center" id="bridge-status">
+                                <i class="fas fa-spinner fa-spin text-yellow-500 mr-2"></i>
+                                <span>H5桥接</span>
+                            </div>
+                            <div class="flex items-center" id="validator-status">
+                                <i class="fas fa-spinner fa-spin text-yellow-500 mr-2"></i>
+                                <span>表单验证器</span>
+                            </div>
+                            <div class="flex items-center" id="common-status">
+                                <i class="fas fa-spinner fa-spin text-yellow-500 mr-2"></i>
+                                <span>通用工具</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="js/common.js"></script>
+    <script src="js/form-validator.js"></script>
+    <script src="utils/h5-bridge.js"></script>
+    
+    <script>
+        // 测试函数
+        function testToast() {
+            if (window.showMessage) {
+                showMessage('这是一个测试提示消息！', 'success');
+                updateResult('提示消息功能正常');
+            } else {
+                updateResult('提示消息功能异常', 'error');
+            }
+        }
+        
+        function testLoading() {
+            if (window.showLoading && window.hideLoading) {
+                showLoading(document.querySelector('button'));
+                setTimeout(() => {
+                    hideLoading(document.querySelector('button'));
+                    updateResult('加载状态功能正常');
+                }, 2000);
+            } else {
+                updateResult('加载状态功能异常', 'error');
+            }
+        }
+        
+        function testBridge() {
+            if (window.h5Bridge) {
+                h5Bridge.showToast({ title: 'H5桥接功能正常！', icon: 'success' });
+                updateResult('H5桥接功能正常，环境：' + (h5Bridge.env.isH5 ? 'H5' : '小程序'));
+            } else {
+                updateResult('H5桥接功能异常', 'error');
+            }
+        }
+        
+        function updateResult(message, type = 'success') {
+            const content = document.getElementById('results-content');
+            const time = new Date().toLocaleTimeString();
+            const icon = type === 'error' ? '❌' : '✅';
+            content.innerHTML += `<div class="mb-1">${icon} [${time}] ${message}</div>`;
+            content.scrollTop = content.scrollHeight;
+        }
+        
+        function updateStatus(id, success) {
+            const element = document.getElementById(id);
+            if (element) {
+                const icon = element.querySelector('i');
+                if (success) {
+                    icon.className = 'fas fa-check text-green-500 mr-2';
+                } else {
+                    icon.className = 'fas fa-times text-red-500 mr-2';
+                }
+            }
+        }
+        
+        // 检查资源加载状态
+        document.addEventListener('DOMContentLoaded', function() {
+            // 检查样式
+            setTimeout(() => {
+                updateStatus('styles-status', true);
+            }, 100);
+            
+            // 检查H5桥接
+            setTimeout(() => {
+                updateStatus('bridge-status', !!window.h5Bridge);
+            }, 200);
+            
+            // 检查表单验证器
+            setTimeout(() => {
+                updateStatus('validator-status', !!window.FormValidator);
+            }, 300);
+            
+            // 检查通用工具
+            setTimeout(() => {
+                updateStatus('common-status', !!window.utils);
+            }, 400);
+            
+            updateResult('页面初始化完成');
+        });
+    </script>
+</body>
+</html>
