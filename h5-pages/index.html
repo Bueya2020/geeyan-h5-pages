@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>iPhone 16 UI展示页面</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/iphone16_fix.css">
+    <link rel="stylesheet" href="css/youpin-tabs.css">
+    <style>
+        :root {
+            --iphone-width: 393px;
+            --iphone-height: 852px;
+            --iphone-radius: 55px;
+            --status-bar-height: 44px;
+            --home-indicator-height: 34px;
+            --bottom-nav-height: 49px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f2f5;
+            padding: 20px;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .page-title h1 {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .page-title p {
+            font-size: 16px;
+            color: #666;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .iphone-frame {
+            width: calc(var(--iphone-width) + 20px);
+            height: calc(var(--iphone-height) + 60px);
+            background-color: #1a1a1a;
+            border-radius: var(--iphone-radius);
+            padding: 10px;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            margin: 0 auto;
+        }
+
+        .iphone-screen {
+            width: var(--iphone-width);
+            height: var(--iphone-height);
+            background-color: white;
+            border-radius: calc(var(--iphone-radius) - 10px);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .iphone-notch {
+            position: absolute;
+            width: 120px;
+            height: 30px;
+            background-color: #1a1a1a;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+            z-index: 10;
+        }
+
+        .iphone-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background-color: #f8f9fa;
+        }
+
+        .iframe-fallback {
+            display: none;
+            width: 100%;
+            height: 100%;
+            background-color: #f8f9fa;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .iframe-fallback.show {
+            display: flex;
+        }
+
+        .fallback-link {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .fallback-link:hover {
+            background-color: #0056b3;
+        }
+
+        .iphone-label {
+            text-align: center;
+            margin-top: 15px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 40px 0 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eaeaea;
+        }
+
+        .validation-link {
+            display: block;
+            margin: 30px auto;
+            padding: 15px 25px;
+            background-color: #000;
+            color: white;
+            text-align: center;
+            border-radius: 8px;
+            font-weight: bold;
+            text-decoration: none;
+            max-width: 400px;
+        }
+
+        .validation-link:hover {
+            background-color: #333;
+        }
+
+        @media (max-width: 768px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+    <!-- 全局错误处理和兜底方案 -->
+    <script>
+        (function() {
+            'use strict';
+            
+            // 创建 Trace 对象的兜底实现
+            window.Trace = window.Trace || {
+                init: function() { console.log('Trace initialized (fallback)'); },
+                log: function() { console.log.apply(console, arguments); },
+                error: function() { console.error.apply(console, arguments); },
+                warn: function() { console.warn.apply(console, arguments); },
+                info: function() { console.info.apply(console, arguments); }
+            };
+
+            // 防止其他可能的调试工具错误
+            window.wx = window.wx || {};
+            window.my = window.my || {};
+            
+            // 防止 chartId 未定义错误
+            window.chartId = window.chartId || 'default-chart-id';
+            
+            // 全局错误处理
+            window.addEventListener('error', function(e) {
+                console.error('Global error caught:', e.error);
+                return true; // 阻止默认错误处理
+            });
+            
+            window.addEventListener('unhandledrejection', function(e) {
+                console.error('Unhandled promise rejection:', e.reason);
+                e.preventDefault(); // 阻止默认处理
+            });
+            
+            console.log('✅ 全局错误处理已初始化');
+        })();
+    </script>
+</head>
+<body>
+    <div class="page-title">
+        <h1>智能设计与施工平台 - iPhone 16 UI适配展示</h1>
+        <p>共55个完整页面，已适配iPhone 16尺寸（393 x 852像素），包含主导航、子页面、用户流程、知识库付费功能（含视频试看）、设计服务购买流程（含付款页面）、项目团队协作、项目空间模块详情页面、增强版商城分类页面（已优化UI）、购物车页面（已优化布局）等完整功能模块</p>
+
+        <!-- 重要提示 -->
+        <div class="mt-4 p-4 bg-yellow-100 border-l-4 border-yellow-500 rounded-lg">
+            <h3 class="font-bold text-yellow-800 mb-2">⚠️ 重要提示</h3>
+            <p class="text-yellow-700 mb-2">如果页面无法在下方预览中显示，这是浏览器安全策略导致的。</p>
+            <p class="text-yellow-700 mb-2"><strong>解决方案：</strong></p>
+            <ol class="text-yellow-700 text-sm list-decimal list-inside">
+                <li>运行 <code class="bg-yellow-200 px-1 rounded">start-server.bat</code> (Windows) 或 <code class="bg-yellow-200 px-1 rounded">start-server.sh</code> (Linux/Mac)</li>
+                <li>然后访问 <a href="http://localhost:8000/index.html" class="text-blue-600 underline">http://localhost:8000/index.html</a></li>
+                <li>或者直接点击下方的"打开XXX页"链接查看单个页面</li>
+            </ol>
+        </div>
+
+        <!-- 页面加载状态 -->
+        <div id="loadStatus" class="mt-4 p-4 bg-gray-100 rounded-lg">
+            <h3 class="font-bold mb-2">页面加载状态:</h3>
+            <div class="flex flex-wrap gap-2">
+                <span class="text-sm">加载中...</span>
+            </div>
+        </div>
+
+        <!-- 页面分类导航 - 小米有品风格 -->
+        <div class="mt-6 bg-white rounded-lg shadow-sm border border-gray-200">
+            <div class="youpin-tab-container">
+                <!-- 左侧滚动指示器 -->
+                <div class="youpin-tab-indicator-left" id="categoryLeftIndicator"></div>
+                <!-- 右侧滚动指示器 -->
+                <div class="youpin-tab-indicator-right" id="categoryRightIndicator"></div>
+
+                <div class="youpin-tab-scrollable" id="categoryScrollable">
+                    <div class="youpin-tab-wrapper">
+                        <button class="youpin-tab active" data-category="all" onclick="filterPages('all')">全部页面</button>
+                        <button class="youpin-tab" data-category="main" onclick="filterPages('main')">主导航</button>
+                        <button class="youpin-tab" data-category="design" onclick="filterPages('design')">设计服务</button>
+                        <button class="youpin-tab" data-category="mall" onclick="filterPages('mall')">商城购物</button>
+                        <button class="youpin-tab" data-category="project" onclick="filterPages('project')">项目管理</button>
+                        <button class="youpin-tab" data-category="knowledge" onclick="filterPages('knowledge')">知识付费</button>
+                        <button class="youpin-tab" data-category="user" onclick="filterPages('user')">用户中心</button>
+                        <button class="youpin-tab" data-category="auth" onclick="filterPages('auth')">登录注册</button>
+                        <button class="youpin-tab" data-category="other" onclick="filterPages('other')">其他功能</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-title" data-category="main">主导航页面</div>
+    <div class="grid-container" data-category="main">
+        <div class="page-item" data-category="main">
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="home.html" class="iphone-iframe" onload="this.style.display='block'" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="home.html" target="_blank" class="fallback-link">打开首页</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">首页</div>
+        </div>
+
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="design-result.html" class="iphone-iframe" onload="this.style.display='block'" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="design-result.html" target="_blank" class="fallback-link">打开设计页</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">设计页（智能设计首页）</div>
+        </div>
+
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="mall.html" class="iphone-iframe" onload="this.style.display='block'" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="mall.html" target="_blank" class="fallback-link">打开商城页</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">商城页</div>
+        </div>
+
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="spaces.html" class="iphone-iframe" onload="this.style.display='block'" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="spaces.html" target="_blank" class="fallback-link">打开施工页</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">施工页</div>
+        </div>
+
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="me.html" class="iphone-iframe" onload="this.style.display='block'" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="me.html" target="_blank" class="fallback-link">打开我的页面</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">我的页面</div>
+        </div>
+
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="optimized_knowledge.html" class="iphone-iframe" onload="this.style.display='block'" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="optimized_knowledge.html" target="_blank" class="fallback-link">打开知识库主页</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">知识库主页（新版）</div>
+        </div>
+
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="requirement-submit.html" class="iphone-iframe" onload="this.style.display='block'" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="requirement-submit.html" target="_blank" class="fallback-link">打开需求提交页</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">需求提交页（智能家居）</div>
+        </div>
+    </div>
+
+    <div class="section-title">施工模块子页面</div>
+    <div class="grid-container">
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="construction-projects.html" class="iphone-iframe"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="construction-projects.html" target="_blank" class="fallback-link">打开我的项目</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">我的项目</div>
+        </div>
+
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="construction-project-detail.html" class="iphone-iframe"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="construction-project-detail.html" target="_blank" class="fallback-link">打开项目详情</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">项目详情</div>
+        </div>
+
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="spaces.html" class="iphone-iframe"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="spaces.html" target="_blank" class="fallback-link">打开施工服务页</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">施工服务页</div>
+        </div>
+
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="construction-space.html" class="iphone-iframe"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="construction-space.html" target="_blank" class="fallback-link">打开施工空间</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">施工空间</div>
+        </div>
+
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="construction-feed.html" class="iphone-iframe"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="construction-feed.html" target="_blank" class="fallback-link">打开施工动态</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">施工动态</div>
+        </div>
+
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="construction-demo.html" class="iphone-iframe"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="construction-demo.html" target="_blank" class="fallback-link">打开施工演示</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">施工演示</div>
+        </div>
+
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="my-projects.html" class="iphone-iframe"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="my-projects.html" target="_blank" class="fallback-link">打开我的项目详情</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">我的项目详情（新功能）</div>
+        </div>
+    </div>
+
+    <div class="section-title">项目空间模块详情页面</div>
+    <div class="grid-container">
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="project-drawings.html" class="iphone-iframe"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="project-drawings.html" target="_blank" class="fallback-link">打开项目图纸</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">项目图纸（新功能）</div>
+        </div>
+
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="project-3d-effects.html" class="iphone-iframe"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="project-3d-effects.html" target="_blank" class="fallback-link">打开3D效果图</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">3D效果图（新功能）</div>
+        </div>
+
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="equipment-list.html" class="iphone-iframe"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="equipment-list.html" target="_blank" class="fallback-link">打开设备清单</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">设备清单（新功能）</div>
+        </div>
+
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="project-construction-guide.html" class="iphone-iframe"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="project-construction-guide.html" target="_blank" class="fallback-link">打开施工说明</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">施工说明（新功能）</div>
+        </div>
+
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="design-budget.html" class="iphone-iframe"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="design-budget.html" target="_blank" class="fallback-link">打开设计预算</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">设计预算（设计模块）</div>
+        </div>
+
+
+    </div>
+
+    <div class="section-title">用户引导流程</div>
+    <div class="grid-container">
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="welcome-coming-soon.html" class="iphone-iframe"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="welcome-coming-soon.html" target="_blank" class="fallback-link">打开欢迎页1</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">欢迎页1 - 即将推出</div>
+        </div>
+
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="welcome-discover.html" class="iphone-iframe"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="welcome-discover.html" target="_blank" class="fallback-link">打开欢迎页2</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">欢迎页2 - 发现品质</div>
+        </div>
+
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="welcome-household.html" class="iphone-iframe"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="welcome-household.html" target="_blank" class="fallback-link">打开欢迎页3</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">欢迎页3 - 智能家居</div>
+        </div>
+
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="welcome-your-wish.html" class="iphone-iframe"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="welcome-your-wish.html" target="_blank" class="fallback-link">打开欢迎页4</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">欢迎页4 - 如你所愿</div>
+        </div>
+    </div>
+
+    <div class="section-title">用户认证模块</div>
+    <div class="grid-container">
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="login.html" class="iphone-iframe"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="login.html" target="_blank" class="fallback-link">打开登录页</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">登录页</div>
+        </div>
+
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="register.html" class="iphone-iframe"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="register.html" target="_blank" class="fallback-link">打开注册页</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">注册页</div>
+        </div>
+
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="forgot-password.html" class="iphone-iframe"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="forgot-password.html" target="_blank" class="fallback-link">打开找回密码页</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">找回密码页</div>
+        </div>
+    </div>
+
+    <div class="section-title">设计模块子页面</div>
+    <div class="grid-container">
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="design.html" class="iphone-iframe"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="design.html" target="_blank" class="fallback-link">打开设计服务页</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">设计服务页</div>
+        </div>
+
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="design-upload.html" class="iphone-iframe"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="design-upload.html" target="_blank" class="fallback-link">打开户型图上传页</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">户型图上传页</div>
+        </div>
+
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="design-project-detail.html" class="iphone-iframe"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="design-project-detail.html" target="_blank" class="fallback-link">打开设计项目详情页</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">设计项目详情页</div>
+        </div>
+
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="design-history.html" class="iphone-iframe"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="design-history.html" target="_blank" class="fallback-link">打开设计历史页</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">设计历史页</div>
+        </div>
+
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="design-service-detail.html" class="iphone-iframe"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="design-service-detail.html" target="_blank" class="fallback-link">打开设计服务详情页</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">设计服务详情页（新功能）</div>
+        </div>
+
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="design-payment.html" class="iphone-iframe"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="design-payment.html" target="_blank" class="fallback-link">打开设计付款页</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">设计付款页（新功能）</div>
+        </div>
+
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="design-budget-viewer.html" class="iphone-iframe"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="design-budget-viewer.html" target="_blank" class="fallback-link">打开设计预算查看器</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">设计预算查看器</div>
+        </div>
+
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="design-equipment-list.html" class="iphone-iframe"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="design-equipment-list.html" target="_blank" class="fallback-link">打开设计设备清单</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">设计设备清单</div>
+        </div>
+    </div>
+
+    <div class="section-title">商城模块子页面</div>
+    <div class="grid-container">
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="mall-category-enhanced.html" class="iphone-iframe"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="mall-category-enhanced.html" target="_blank" class="fallback-link">打开商城分类页</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">商城分类页（增强版，已优化UI）</div>
+        </div>
+
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="mall-detail.html" class="iphone-iframe"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="mall-detail.html" target="_blank" class="fallback-link">打开商品详情页</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">商品详情页</div>
+        </div>
+
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="mall-cart.html" class="iphone-iframe"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="mall-cart.html" target="_blank" class="fallback-link">打开购物车页</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">购物车页（已优化布局，整合去结算功能）</div>
+        </div>
+
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="mall-order.html" class="iphone-iframe"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="mall-order.html" target="_blank" class="fallback-link">打开订单页</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">订单页</div>
+        </div>
+
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="mall-search.html" class="iphone-iframe"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="mall-search.html" target="_blank" class="fallback-link">打开商品搜索页</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">商品搜索页</div>
+        </div>
+
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="order-confirm.html" class="iphone-iframe"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="order-confirm.html" target="_blank" class="fallback-link">打开订单确认页</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">订单确认页（新功能）</div>
+        </div>
+    </div>
+
+    <div class="section-title">个人中心子页面</div>
+    <div class="grid-container">
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="profile-edit.html" class="iphone-iframe"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="profile-edit.html" target="_blank" class="fallback-link">打开个人资料编辑页</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">个人资料编辑页</div>
+        </div>
+
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="profile-address.html" class="iphone-iframe"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="profile-address.html" target="_blank" class="fallback-link">打开收货地址页</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">收货地址页</div>
+        </div>
+
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="profile-help.html" class="iphone-iframe"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="profile-help.html" target="_blank" class="fallback-link">打开帮助与客服页</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">帮助与客服页</div>
+        </div>
+    </div>
+
+    <div class="section-title">知识库模块子页面</div>
+    <div class="grid-container">
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="knowledge.html" class="iphone-iframe"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="knowledge.html" target="_blank" class="fallback-link">打开知识库页</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">知识库页（旧版）</div>
+        </div>
+
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="knowledge-detail.html" class="iphone-iframe"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="knowledge-detail.html" target="_blank" class="fallback-link">打开知识详情页</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">知识详情页</div>
+        </div>
+
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="knowledge-content.html" class="iphone-iframe"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="knowledge-content.html" target="_blank" class="fallback-link">打开知识内容页</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">知识内容页</div>
+        </div>
+
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="knowledge-article.html" class="iphone-iframe"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="knowledge-article.html" target="_blank" class="fallback-link">打开知识库付费文章</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">知识库付费文章（新功能）</div>
+        </div>
+
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="knowledge-video-preview.html" class="iphone-iframe"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="knowledge-video-preview.html" target="_blank" class="fallback-link">打开知识库视频试看</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">知识库视频试看（新功能）</div>
+        </div>
+    </div>
+
+    <div class="section-title">功能页面</div>
+    <div class="grid-container">
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="ai-assistant.html" class="iphone-iframe"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="ai-assistant.html" target="_blank" class="fallback-link">打开AI助手页</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">AI助手页</div>
+        </div>
+
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="spaces.html" class="iphone-iframe"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="spaces.html" target="_blank" class="fallback-link">打开施工空间主页</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">施工空间主页</div>
+        </div>
+
+        <div>
+            <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                    <iframe src="project-team.html" class="iphone-iframe"></iframe>
+                    <div class="iframe-fallback">
+                        <p>页面预览</p>
+                        <a href="project-team.html" target="_blank" class="fallback-link">打开项目团队页</a>
+                    </div>
+                </div>
+            </div>
+            <div class="iphone-label">项目团队页（新功能）</div>
+        </div>
+    </div>
+
+    <a href="iphone16_validation_report.md" class="validation-link">查看iPhone 16 UI适配专项校验报告</a>
+
+    <script>
+        // 处理iframe加载失败的情况
+        document.addEventListener('DOMContentLoaded', function() {
+            const iframes = document.querySelectorAll('.iphone-iframe');
+            const loadStatus = document.getElementById('loadStatus');
+            const statusContainer = loadStatus.querySelector('.flex');
+            let loadedCount = 0;
+            let failedCount = 0;
+            const totalCount = iframes.length;
+
+            // 更新状态显示
+            function updateStatus() {
+                statusContainer.innerHTML = `
+                    <span class="px-2 py-1 bg-green-200 text-green-800 rounded text-sm">成功: ${loadedCount}</span>
+                    <span class="px-2 py-1 bg-red-200 text-red-800 rounded text-sm">失败: ${failedCount}</span>
+                    <span class="px-2 py-1 bg-blue-200 text-blue-800 rounded text-sm">总计: ${totalCount}</span>
+                `;
+            }
+
+            iframes.forEach(function(iframe) {
+                const fileName = iframe.src.split('/').pop();
+
+                // 如果iframe还没有onload处理器，添加统一的处理
+                if (!iframe.hasAttribute('onload')) {
+                    iframe.setAttribute('onload', "this.style.display='block'");
+                }
+                if (!iframe.hasAttribute('onerror')) {
+                    iframe.setAttribute('onerror', "this.style.display='none'; this.nextElementSibling.style.display='flex'");
+                }
+
+                // 设置加载超时
+                const timeout = setTimeout(function() {
+                    if (iframe.style.display !== 'block') {
+                        showFallback(iframe);
+                        failedCount++;
+                        console.log(`❌ ${fileName} 加载超时`);
+                        updateStatus();
+                    }
+                }, 5000);
+
+                iframe.onload = function() {
+                    clearTimeout(timeout);
+                    // 简化加载检查，避免跨域问题
+                    iframe.style.display = 'block';
+                    loadedCount++;
+                    console.log(`✅ ${fileName} 加载成功`);
+                    updateStatus();
+                };
+
+                iframe.onerror = function() {
+                    clearTimeout(timeout);
+                    showFallback(iframe);
+                    failedCount++;
+                    console.log(`❌ ${fileName} 加载失败 - 网络错误`);
+                    updateStatus();
+                };
+            });
+
+            function showFallback(iframe) {
+                iframe.style.display = 'none';
+                const fallback = iframe.nextElementSibling;
+                if (fallback && fallback.classList.contains('iframe-fallback')) {
+                    fallback.classList.add('show');
+                }
+            }
+
+            // 初始化状态显示
+            updateStatus();
+
+            // 初始化分类导航
+            initCategoryNavigation();
+        });
+
+        // 页面分类过滤功能
+        function filterPages(category) {
+            // 更新tab激活状态
+            document.querySelectorAll('.youpin-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // 滚动到当前激活的tab
+            scrollToActiveTab(event.target);
+
+            // 显示/隐藏页面
+            const allSections = document.querySelectorAll('.section-title, .grid-container');
+
+            if (category === 'all') {
+                // 显示所有页面
+                allSections.forEach(section => {
+                    section.style.display = '';
+                });
+            } else {
+                // 只显示指定分类的页面
+                allSections.forEach(section => {
+                    const sectionCategory = section.getAttribute('data-category');
+                    if (sectionCategory === category) {
+                        section.style.display = '';
+                    } else {
+                        section.style.display = 'none';
+                    }
+                });
+            }
+
+            console.log('切换到分类:', category);
+        }
+
+        // 滚动到激活的tab
+        function scrollToActiveTab(activeTab) {
+            const scrollContainer = document.getElementById('categoryScrollable');
+            if (!scrollContainer || !activeTab) return;
+
+            const containerRect = scrollContainer.getBoundingClientRect();
+            const tabRect = activeTab.getBoundingClientRect();
+
+            const scrollLeft = scrollContainer.scrollLeft;
+            const tabLeft = tabRect.left - containerRect.left + scrollLeft;
+            const tabWidth = tabRect.width;
+            const containerWidth = containerRect.width;
+
+            // 计算目标滚动位置，让tab居中显示
+            const targetScrollLeft = tabLeft - (containerWidth - tabWidth) / 2;
+
+            scrollContainer.scrollTo({
+                left: Math.max(0, targetScrollLeft),
+                behavior: 'smooth'
+            });
+        }
+
+        // 更新滚动指示器
+        function updateScrollIndicators() {
+            const scrollContainer = document.getElementById('categoryScrollable');
+            const leftIndicator = document.getElementById('categoryLeftIndicator');
+            const rightIndicator = document.getElementById('categoryRightIndicator');
+
+            if (!scrollContainer || !leftIndicator || !rightIndicator) return;
+
+            const scrollLeft = scrollContainer.scrollLeft;
+            const maxScrollLeft = scrollContainer.scrollWidth - scrollContainer.clientWidth;
+
+            // 显示/隐藏左侧指示器
+            if (scrollLeft > 10) {
+                leftIndicator.classList.add('show');
+            } else {
+                leftIndicator.classList.remove('show');
+            }
+
+            // 显示/隐藏右侧指示器
+            if (scrollLeft < maxScrollLeft - 10) {
+                rightIndicator.classList.add('show');
+            } else {
+                rightIndicator.classList.remove('show');
+            }
+        }
+
+        // 初始化分类导航
+        function initCategoryNavigation() {
+            const scrollContainer = document.getElementById('categoryScrollable');
+            if (scrollContainer) {
+                scrollContainer.addEventListener('scroll', updateScrollIndicators);
+
+                // 初始化滚动指示器
+                setTimeout(updateScrollIndicators, 100);
+            }
+        }
+    </script>
+</body>
+</html>

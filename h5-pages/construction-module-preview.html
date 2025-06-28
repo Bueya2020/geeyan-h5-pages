@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>施工模块预览 - 智能设计与施工</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/iphone16_fix.css">
+    <style>
+        /* 页面特定样式 */
+        .project-tabs {
+            display: flex;
+            padding: 0 16px;
+            border-bottom: 1px solid #e5e7eb;
+            background-color: #fff;
+        }
+
+        .tab-item {
+            padding: 12px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #6b7280;
+            position: relative;
+        }
+
+        .tab-item.active {
+            color: #000;
+        }
+
+        .tab-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 16px;
+            right: 16px;
+            height: 2px;
+            background-color: #000;
+        }
+
+        .project-card {
+            background-color: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            margin-bottom: 16px;
+        }
+
+        .project-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f3f4f6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .project-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #1f2937;
+        }
+
+        .project-status {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-progress {
+            background-color: rgba(14, 165, 233, 0.1);
+            color: #0ea5e9;
+        }
+
+        .status-completed {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+        }
+
+        .status-pending {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+        }
+
+        .project-info {
+            padding: 12px 16px;
+        }
+
+        .info-item {
+            display: flex;
+            margin-bottom: 8px;
+        }
+
+        .info-label {
+            width: 70px;
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .info-value {
+            flex: 1;
+            font-size: 14px;
+            color: #1f2937;
+        }
+
+        .project-progress {
+            padding: 0 16px 16px;
+        }
+
+        .progress-bar-container {
+            height: 6px;
+            background-color: #e5e7eb;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: #000;
+            border-radius: 3px;
+        }
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+        }
+
+        .progress-percent {
+            color: #000;
+            font-weight: 500;
+        }
+
+        .progress-date {
+            color: #6b7280;
+        }
+
+        .project-actions {
+            display: flex;
+            padding: 12px 16px;
+            border-top: 1px solid #f3f4f6;
+        }
+
+        .action-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 0;
+            flex: 1;
+        }
+
+        .action-icon {
+            font-size: 20px;
+            color: #6b7280;
+            margin-bottom: 4px;
+        }
+
+        .action-text {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        .scrollbar-none::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-none {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+
+    <!-- 全局错误处理和兜底方案 -->
+    <script>
+        (function() {
+            'use strict';
+            
+            // 创建 Trace 对象的兜底实现
+            window.Trace = window.Trace || {
+                init: function() { console.log('Trace initialized (fallback)'); },
+                log: function() { console.log.apply(console, arguments); },
+                error: function() { console.error.apply(console, arguments); },
+                warn: function() { console.warn.apply(console, arguments); },
+                info: function() { console.info.apply(console, arguments); }
+            };
+
+            // 防止其他可能的调试工具错误
+            window.wx = window.wx || {};
+            window.my = window.my || {};
+            
+            // 防止 chartId 未定义错误
+            window.chartId = window.chartId || 'default-chart-id';
+            
+            // 全局错误处理
+            window.addEventListener('error', function(e) {
+                console.error('Global error caught:', e.error);
+                return true; // 阻止默认错误处理
+            });
+            
+            window.addEventListener('unhandledrejection', function(e) {
+                console.error('Unhandled promise rejection:', e.reason);
+                e.preventDefault(); // 阻止默认处理
+            });
+            
+            console.log('✅ 全局错误处理已初始化');
+        })();
+    </script>
+</head>
+<body class="min-h-screen w-full bg-[#000000] flex items-center justify-center font-system">
+    <!-- iPhone 容器 -->
+    <div class="w-full max-w-[393px] h-[852px] bg-[#1E1E1E] shadow-2xl overflow-hidden relative mx-auto rounded-[54px]">
+        <!-- iPhone 状态栏 -->
+        <div class="w-full h-[47px] bg-black px-5 flex items-center justify-between text-white text-[14px] font-medium">
+            <div class="flex items-center space-x-1">
+                <!-- 信号图标 -->
+                <svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2 20h.01"></path>
+                    <path d="M7 20v-4"></path>
+                    <path d="M12 20v-8"></path>
+                    <path d="M17 20V8"></path>
+                    <path d="M22 4v16"></path>
+                </svg>
+                <span>中国移动</span>
+                <!-- WiFi图标 -->
+                <svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 20h.01"></path>
+                    <path d="M2 8.82a15 15 0 0 1 20 0"></path>
+                    <path d="M5 12.859a10 10 0 0 1 14 0"></path>
+                    <path d="M8.5 16.429a5 5 0 0 1 7 0"></path>
+                </svg>
+            </div>
+            <div class="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2">9:41</div>
+            <div class="flex items-center space-x-1">
+                <span>89%</span>
+                <!-- 电池图标 -->
+                <svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
+                    <rect height="10" rx="2" ry="2" width="16" x="2" y="7"></rect>
+                    <line x1="22" x2="22" y1="11" y2="13"></line>
+                </svg>
+            </div>
+        </div>
+
+        <!-- 动态岛 -->
+        <button class="absolute left-1/2 -translate-x-1/2 bg-black transition-all duration-300 ease-out w-[126px] h-[37.5px] -top-0.5 rounded-b-[24px]"></button>
+
+        <!-- 主内容区域 -->
+        <div class="w-full h-[calc(100%-47px)] bg-white overflow-hidden relative">
+            <!-- 滚动内容区域 -->
+            <div class="absolute inset-0 bottom-[84px] overflow-y-auto scrollbar-none">
+                <!-- 顶部导航栏 -->
+                <header class="bg-white border-b border-gray-200">
+                    <div class="flex items-center justify-between px-4 py-3">
+                        <a href="spaces.html" class="text-black">
+                            <i class="fas fa-arrow-left"></i>
+                        </a>
+                        <h1 class="text-sm font-medium text-black">施工模块预览</h1>
+                        <a href="#" class="text-black">
+                            <i class="fas fa-ellipsis-vertical"></i>
+                        </a>
+                    </div>
+                </header>
+        <!-- 项目标签页 -->
+        <div class="project-tabs">
+            <div class="tab-item active">我的项目</div>
+            <div class="tab-item">进行中</div>
+            <div class="tab-item">已完成</div>
+            <div class="tab-item">待确认</div>
+        </div>
+
+        <!-- 项目列表 -->
+        <div class="p-4">
+            <div class="project-card">
+                <div class="project-header">
+                    <h3 class="project-title">城市花园三居室装修</h3>
+                    <span class="project-status status-progress">进行中</span>
+                </div>
+                <div class="project-info">
+                    <div class="info-item">
+                        <span class="info-label">项目编号</span>
+                        <span class="info-value">PRJ20250601</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">开始日期</span>
+                        <span class="info-value">2025-05-15</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">预计完成</span>
+                        <span class="info-value">2025-08-15</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">项目经理</span>
+                        <span class="info-value">张工</span>
+                    </div>
+                </div>
+                <div class="project-progress">
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" style="width: 65%"></div>
+                    </div>
+                    <div class="progress-text">
+                        <span class="progress-percent">65%</span>
+                        <span class="progress-date">预计20天后完成</span>
+                    </div>
+                </div>
+                <div class="project-actions">
+                    <div class="action-button">
+                        <i class="fas fa-eye action-icon"></i>
+                        <span class="action-text">查看详情</span>
+                    </div>
+                    <div class="action-button">
+                        <i class="fas fa-comment action-icon"></i>
+                        <span class="action-text">联系项目经理</span>
+                    </div>
+                    <div class="action-button">
+                        <i class="fas fa-camera action-icon"></i>
+                        <span class="action-text">施工照片</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <div class="project-header">
+                    <h3 class="project-title">阳光公寓二居室装修</h3>
+                    <span class="project-status status-completed">已完成</span>
+                </div>
+                <div class="project-info">
+                    <div class="info-item">
+                        <span class="info-label">项目编号</span>
+                        <span class="info-value">PRJ20250502</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">开始日期</span>
+                        <span class="info-value">2025-03-10</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">完成日期</span>
+                        <span class="info-value">2025-05-20</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">项目经理</span>
+                        <span class="info-value">李工</span>
+                    </div>
+                </div>
+                <div class="project-progress">
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" style="width: 100%"></div>
+                    </div>
+                    <div class="progress-text">
+                        <span class="progress-percent">100%</span>
+                        <span class="progress-date">已完成</span>
+                    </div>
+                </div>
+                <div class="project-actions">
+                    <div class="action-button">
+                        <i class="fas fa-eye action-icon"></i>
+                        <span class="action-text">查看详情</span>
+                    </div>
+                    <div class="action-button">
+                        <i class="fas fa-star action-icon"></i>
+                        <span class="action-text">评价</span>
+                    </div>
+                    <div class="action-button">
+                        <i class="fas fa-camera action-icon"></i>
+                        <span class="action-text">施工照片</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <div class="project-header">
+                    <h3 class="project-title">绿地花园别墅装修</h3>
+                    <span class="project-status status-pending">待确认</span>
+                </div>
+                <div class="project-info">
+                    <div class="info-item">
+                        <span class="info-label">项目编号</span>
+                        <span class="info-value">PRJ20250603</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">提交日期</span>
+                        <span class="info-value">2025-06-01</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">预估工期</span>
+                        <span class="info-value">90天</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">预估金额</span>
+                        <span class="info-value">¥350,000</span>
+                    </div>
+                </div>
+                <div class="project-actions">
+                    <div class="action-button">
+                        <i class="fas fa-eye action-icon"></i>
+                        <span class="action-text">查看详情</span>
+                    </div>
+                    <div class="action-button">
+                        <i class="fas fa-check-circle action-icon"></i>
+                        <span class="action-text">确认方案</span>
+                    </div>
+                    <div class="action-button">
+                        <i class="fas fa-times-circle action-icon"></i>
+                        <span class="action-text">取消</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+            </div>
+
+            <!-- 底部导航栏 -->
+<div class="absolute bottom-0 left-0 right-0 h-[84px] bg-white/80 backdrop-blur-xl border-t border-white/20">
+<!-- 导航栏内容 -->
+<nav class="h-[49px] flex items-center px-2">
+<div class="flex justify-around w-full text-[12px]">
+<a class="flex flex-col items-center group text-gray-400 hover:text-gray-600 active:text-gray-800 transition-colors" href="home.html">
+<div class="transform transition-transform group-hover:scale-110 group-active:scale-95">
+<svg class="w-[22px] h-[22px] stroke-[1.5]" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+<polyline points="9 22 9 12 15 12 15 22"></polyline>
+</svg>
+</div>
+<span class="mt-1">首页</span>
+</a>
+<a class="flex flex-col items-center group text-gray-400 hover:text-gray-600 active:text-gray-800 transition-colors" href="design-result.html">
+<div class="transform transition-transform group-hover:scale-110 group-active:scale-95">
+<svg class="w-[22px] h-[22px] stroke-[1.5]" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+<circle cx="13.5" cy="6.5" fill="currentColor" r=".5"></circle>
+<circle cx="17.5" cy="10.5" fill="currentColor" r=".5"></circle>
+<circle cx="8.5" cy="7.5" fill="currentColor" r=".5"></circle>
+<circle cx="6.5" cy="12.5" fill="currentColor" r=".5"></circle>
+<path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"></path>
+</svg>
+</div>
+<span class="mt-1">设计</span>
+</a>
+<a class="flex flex-col items-center group text-gray-400 hover:text-gray-600 active:text-gray-800 transition-colors" href="mall.html">
+<div class="transform transition-transform group-hover:scale-110 group-active:scale-95">
+<svg class="w-[22px] h-[22px] stroke-[1.5]" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+<path d="M3 6h18"></path>
+<path d="M16 10a4 4 0 0 1-8 0"></path>
+</svg>
+</div>
+<span class="mt-1">商城</span>
+</a>
+<a class="flex flex-col items-center group text-black transition-colors" href="spaces.html" class="flex flex-col items-center group text-black transition-colors">
+<div class="transform transition-transform group-hover:scale-110 group-active:scale-95">
+<svg class="w-[22px] h-[22px] stroke-[1.5]" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="m15 12-8.373 8.373a1 1 0 1 1-3-3L12 9"></path>
+<path d="m18 15 4-4"></path>
+<path d="m21.5 11.5-1.914-1.914A2 2 0 0 1 19 8.172V7l-2.26-2.26a6 6 0 0 0-4.202-1.756L9 2.96l.92.82A6.18 6.18 0 0 1 12 8.4V10l2 2h1.172a2 2 0 0 1 1.414.586L18.5 14.5"></path>
+</svg>
+</div>
+<span class="mt-1">施工</span>
+</a>
+<a class="flex flex-col items-center group text-gray-400 hover:text-gray-600 active:text-gray-800 transition-colors" href="me.html">
+<div class="transform transition-transform group-hover:scale-110 group-active:scale-95">
+<svg class="w-[22px] h-[22px] stroke-[1.5]" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+<circle cx="12" cy="7" r="4"></circle>
+</svg>
+</div>
+<span class="mt-1">我的</span>
+</a>
+</div>
+</nav>
+<!-- iPhone 16 Home Indicator -->
+<div class="h-[34px] flex items-center justify-center">
+<div class="w-[134px] h-[5px] bg-black rounded-full"></div>
+</div>
+</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

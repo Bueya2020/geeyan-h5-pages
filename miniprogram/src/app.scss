@@ -1,0 +1,252 @@
+/*  完全移除WeUI库引入 - 使用自定义轻量样式 */
+/*  这将大幅减少CSS体积（从839KB减少到约50KB以下） */
+
+/*  轻量级CSS变量定义（替代WeUI变量） */
+:root {
+  --primary-color: #666666;
+  --success-color: #000000;
+  --warning-color: #666666;
+  --error-color: #999999;
+  --text-color: #333333;
+  --bg-color: #F5F5F5;
+  --border-color: #CCCCCC;
+  --border-radius: 8rpx;
+  --spacing-xs: 10rpx;
+  --spacing-sm: 20rpx;
+  --spacing-md: 30rpx;
+  --spacing-lg: 40rpx;
+}
+
+/*  导入全局样式 */
+@import './assets/styles/variables.scss';
+@import './assets/styles/mixins.scss';
+@import './assets/styles/reset.scss';
+
+/*  全局样式 */
+.app {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 28rpx;
+  line-height: 1.5;
+  color: #333333;
+  background-color: #F5F5F5;
+}
+
+/*  页面容器 */
+.page {
+  min-height: 100vh;
+  background-color: #F5F5F5;
+
+  &--with-tabbar {
+    padding-bottom: 120rpx;
+  }
+
+  &--with-header {
+    padding-top: 88rpx;
+  }
+
+  /*  颜色变量 */
+  --color-gray-light: #F5F5F5;
+  --color-black: #000000;
+  --color-white: #FFFFFF;
+  --color-gray-text: #666666;
+  --color-blue-accent: #1890ff;
+  --color-gray-border: #EEEEEE;
+  
+  /*  间距变量 */
+  --spacing-3: 12px;
+  --spacing-md: 16px;
+  
+  /*  字体变量 */
+  --font-size-base: 14px;
+  --font-size-lg: 16px;
+}
+
+/*  安全区域适配 */
+.safe-area {
+  &--top {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  &--bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  &--all {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/*  容器 */
+.container {
+  max-width: 750rpx;
+  margin: 0 auto;
+  padding: 0 30rpx;
+}
+
+/*  加载状态 */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60rpx;
+
+  &__spinner {
+    width: 48rpx;
+    height: 48rpx;
+    border: 4rpx solid #F5F5F5;
+    border-top: 4rpx solid #666666;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 20rpx;
+  }
+
+  &__text {
+    color: #666666;
+    font-size: 24rpx;
+  }
+}
+
+/*  空状态 */
+.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 120rpx 30rpx;
+
+  &__icon {
+    width: 160rpx;
+    height: 160rpx;
+    margin-bottom: 30rpx;
+    opacity: 0.3;
+  }
+
+  &__text {
+    color: #666666;
+    font-size: 28rpx;
+  }
+}
+
+/*  错误状态 */
+.error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 120rpx 30rpx;
+
+  &__icon {
+    width: 160rpx;
+    height: 160rpx;
+    margin-bottom: 30rpx;
+    opacity: 0.3;
+  }
+
+  &__text {
+    color: #999999;
+    font-size: 28rpx;
+    text-align: center;
+    margin-bottom: 30rpx;
+  }
+
+  &__retry {
+    color: #666666;
+    font-size: 24rpx;
+    text-decoration: underline;
+  }
+}
+
+/*  分割线 */
+.divider {
+  height: 1px;
+  background-color: #CCCCCC;
+  margin: 30rpx 0;
+
+  &--thick {
+    height: 16rpx;
+    background-color: #F5F5F5;
+    margin: 40rpx 0;
+  }
+}
+
+/*  标签 */
+.tag {
+  display: inline-block;
+  padding: 8rpx 16rpx;
+  font-size: 20rpx;
+  line-height: 1;
+  border-radius: 8rpx;
+
+  &--primary {
+    color: white;
+    background-color: #666666;
+  }
+
+  &--success {
+    color: white;
+    background-color: #000000;
+  }
+
+  &--warning {
+    color: white;
+    background-color: #666666;
+  }
+
+  &--error {
+    color: white;
+    background-color: #999999;
+  }
+
+  &--info {
+    color: white;
+    background-color: #666666;
+  }
+
+  &--light {
+    color: #333333;
+    background-color: #F5F5F5;
+  }
+}
+
+/*  徽章 */
+.badge {
+  position: relative;
+  display: inline-block;
+
+  &__dot {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 16rpx;
+    height: 16rpx;
+    background-color: #999999;
+    border-radius: 50%;
+    transform: translate(50%, -50%);
+  }
+
+  &__count {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 32rpx;
+    height: 32rpx;
+    padding: 0 8rpx;
+    font-size: 20rpx;
+    line-height: 32rpx;
+    color: white;
+    background-color: #999999;
+    border-radius: 16rpx;
+    text-align: center;
+    transform: translate(50%, -50%);
+  }
+}
+
+/*  添加spin动画 */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/*  全局重置样式 - 移除通配符选择器，使用具体组件选择器 */
+/* 注意：WXSS 不支持通配符 * 选择器，已在 reset.scss 中使用具体组件选择器 */

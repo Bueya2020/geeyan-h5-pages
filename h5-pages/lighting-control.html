@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>灯光效果 - 智能设计与施工</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/iphone16_fix.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        .scrollbar-none::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-none {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        .scene-card {
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .scene-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .scene-active {
+            border: 2px solid #000;
+            background: #f8fafc;
+        }
+        
+        .slider-container {
+            position: relative;
+        }
+        
+        .slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #e2e8f0;
+            outline: none;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #000;
+            cursor: pointer;
+        }
+        
+        .color-picker {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .color-picker:hover {
+            transform: scale(1.1);
+        }
+        
+        .color-picker.active {
+            border-color: #000;
+            transform: scale(1.2);
+        }
+        
+        .room-control {
+            background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+            border: 1px solid #cbd5e1;
+        }
+        
+        .room-control.active {
+            background: linear-gradient(135deg, #000, #374151);
+            color: white;
+        }
+    </style>
+
+    <!-- 全局错误处理和兜底方案 -->
+    <script>
+        (function() {
+            'use strict';
+            
+            // 创建 Trace 对象的兜底实现
+            window.Trace = window.Trace || {
+                init: function() { console.log('Trace initialized (fallback)'); },
+                log: function() { console.log.apply(console, arguments); },
+                error: function() { console.error.apply(console, arguments); },
+                warn: function() { console.warn.apply(console, arguments); },
+                info: function() { console.info.apply(console, arguments); }
+            };
+
+            // 防止其他可能的调试工具错误
+            window.wx = window.wx || {};
+            window.my = window.my || {};
+            
+            // 防止 chartId 未定义错误
+            window.chartId = window.chartId || 'default-chart-id';
+            
+            // 全局错误处理
+            window.addEventListener('error', function(e) {
+                console.error('Global error caught:', e.error);
+                return true; // 阻止默认错误处理
+            });
+            
+            window.addEventListener('unhandledrejection', function(e) {
+                console.error('Unhandled promise rejection:', e.reason);
+                e.preventDefault(); // 阻止默认处理
+            });
+            
+            console.log('✅ 全局错误处理已初始化');
+        })();
+    </script>
+</head>
+<body class="min-h-screen w-full bg-[#000000] flex items-center justify-center font-system">
+    <!-- iPhone 容器 -->
+    <div class="w-full max-w-[393px] h-[852px] bg-[#1E1E1E] shadow-2xl overflow-hidden relative mx-auto rounded-[54px]">
+        <!-- iPhone 状态栏 -->
+        <div class="w-full h-[47px] bg-black px-5 flex items-center justify-between text-white text-[14px] font-medium">
+            <div class="flex items-center space-x-1">
+                <svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2 20h.01"></path>
+                    <path d="M7 20v-4"></path>
+                    <path d="M12 20v-8"></path>
+                    <path d="M17 20V8"></path>
+                    <path d="M22 4v16"></path>
+                </svg>
+                <span>中国移动</span>
+                <svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 20h.01"></path>
+                    <path d="M2 8.82a15 15 0 0 1 20 0"></path>
+                    <path d="M5 12.859a10 10 0 0 1 14 0"></path>
+                    <path d="M8.5 16.429a5 5 0 0 1 7 0"></path>
+                </svg>
+            </div>
+            <div class="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2">9:41</div>
+            <div class="flex items-center space-x-1">
+                <span>89%</span>
+                <svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
+                    <rect height="10" rx="2" ry="2" width="16" x="2" y="7"></rect>
+                    <line x1="22" x2="22" y1="11" y2="13"></line>
+                </svg>
+            </div>
+        </div>
+
+        <!-- 动态岛 -->
+        <button class="absolute left-1/2 -translate-x-1/2 bg-black transition-all duration-300 ease-out w-[126px] h-[37.5px] -top-0.5 rounded-b-[24px]"></button>
+
+        <!-- 主内容区域 -->
+        <div class="w-full h-[calc(100%-47px)] bg-white overflow-hidden relative">
+            <!-- 滚动内容区域 -->
+            <div class="absolute inset-0 bottom-[84px] overflow-y-auto scrollbar-none">
+                <!-- 顶部导航栏 -->
+                <header class="bg-white border-b border-gray-200">
+                    <div class="flex items-center justify-between px-4 py-3">
+                        <a class="text-black" href="construction-project-detail.html">
+                            <i class="fas fa-arrow-left"></i>
+                        </a>
+                        <h1 class="text-sm font-medium text-black">灯光效果</h1>
+                        <a class="text-black" href="#">
+                            <i class="fas fa-cog"></i>
+                        </a>
+                    </div>
+                </header>
+
+                <!-- 项目信息 -->
+                <section class="px-4 py-4 bg-gray-50">
+                    <div class="bg-white p-4 rounded-lg">
+                        <h2 class="text-lg font-semibold mb-2">现代简约风智能家居</h2>
+                        <div class="text-sm text-gray-500 mb-1">智能照明系统控制</div>
+                        <div class="text-sm text-gray-500">当前状态: 已连接 · 12个设备在线</div>
+                    </div>
+                </section>
+
+                <!-- 场景模式选择 -->
+                <section class="px-4 py-4 bg-white">
+                    <h3 class="text-sm font-medium mb-4">场景模式</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="scene-card scene-active p-4 rounded-lg border-2" onclick="selectScene('home')">
+                            <div class="text-center">
+                                <i class="fas fa-home text-2xl mb-2"></i>
+                                <div class="text-sm font-medium">居家模式</div>
+                                <div class="text-xs text-gray-500">温馨舒适</div>
+                            </div>
+                        </div>
+                        <div class="scene-card p-4 rounded-lg border-2 border-gray-200" onclick="selectScene('work')">
+                            <div class="text-center">
+                                <i class="fas fa-laptop text-2xl mb-2"></i>
+                                <div class="text-sm font-medium">工作模式</div>
+                                <div class="text-xs text-gray-500">明亮专注</div>
+                            </div>
+                        </div>
+                        <div class="scene-card p-4 rounded-lg border-2 border-gray-200" onclick="selectScene('relax')">
+                            <div class="text-center">
+                                <i class="fas fa-moon text-2xl mb-2"></i>
+                                <div class="text-sm font-medium">休闲模式</div>
+                                <div class="text-xs text-gray-500">柔和放松</div>
+                            </div>
+                        </div>
+                        <div class="scene-card p-4 rounded-lg border-2 border-gray-200" onclick="selectScene('party')">
+                            <div class="text-center">
+                                <i class="fas fa-music text-2xl mb-2"></i>
+                                <div class="text-sm font-medium">聚会模式</div>
+                                <div class="text-xs text-gray-500">动感炫彩</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 亮度调节 -->
+                <section class="px-4 py-4 bg-white mt-2">
+                    <h3 class="text-sm font-medium mb-4">亮度调节</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm">整体亮度</span>
+                            <span class="text-sm font-medium" id="brightness-value">75%</span>
+                        </div>
+                        <div class="slider-container">
+                            <input type="range" min="0" max="100" value="75" class="slider" id="brightness-slider" oninput="updateBrightness(this.value)">
+                        </div>
+                        <div class="flex justify-between text-xs text-gray-500">
+                            <span>暗</span>
+                            <span>亮</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 色温控制 -->
+                <section class="px-4 py-4 bg-white mt-2">
+                    <h3 class="text-sm font-medium mb-4">色温控制</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm">色温</span>
+                            <span class="text-sm font-medium" id="temperature-value">4000K</span>
+                        </div>
+                        <div class="slider-container">
+                            <input type="range" min="2700" max="6500" value="4000" class="slider" id="temperature-slider" oninput="updateTemperature(this.value)">
+                        </div>
+                        <div class="flex justify-between text-xs text-gray-500">
+                            <span>暖光</span>
+                            <span>冷光</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 颜色选择 -->
+                <section class="px-4 py-4 bg-white mt-2">
+                    <h3 class="text-sm font-medium mb-4">颜色选择</h3>
+                    <div class="flex justify-between items-center">
+                        <div class="color-picker active" style="background: #ffffff;" onclick="selectColor('#ffffff')"></div>
+                        <div class="color-picker" style="background: #ff6b6b;" onclick="selectColor('#ff6b6b')"></div>
+                        <div class="color-picker" style="background: #4ecdc4;" onclick="selectColor('#4ecdc4')"></div>
+                        <div class="color-picker" style="background: #45b7d1;" onclick="selectColor('#45b7d1')"></div>
+                        <div class="color-picker" style="background: #96ceb4;" onclick="selectColor('#96ceb4')"></div>
+                        <div class="color-picker" style="background: #feca57;" onclick="selectColor('#feca57')"></div>
+                        <div class="color-picker" style="background: #ff9ff3;" onclick="selectColor('#ff9ff3')"></div>
+                    </div>
+                </section>
+
+                <!-- 房间控制 -->
+                <section class="px-4 py-4 bg-white mt-2">
+                    <h3 class="text-sm font-medium mb-4">房间控制</h3>
+                    <div class="space-y-3">
+                        <div class="room-control active p-3 rounded-lg flex items-center justify-between" onclick="toggleRoom('living')">
+                            <div class="flex items-center">
+                                <i class="fas fa-couch mr-3"></i>
+                                <div>
+                                    <div class="text-sm font-medium">客厅</div>
+                                    <div class="text-xs opacity-75">4个设备 · 已开启</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <span class="text-sm">85%</span>
+                                <i class="fas fa-toggle-on text-lg"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="room-control p-3 rounded-lg flex items-center justify-between" onclick="toggleRoom('bedroom')">
+                            <div class="flex items-center">
+                                <i class="fas fa-bed mr-3"></i>
+                                <div>
+                                    <div class="text-sm font-medium">卧室</div>
+                                    <div class="text-xs opacity-75">3个设备 · 已关闭</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <span class="text-sm">0%</span>
+                                <i class="fas fa-toggle-off text-lg"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="room-control p-3 rounded-lg flex items-center justify-between" onclick="toggleRoom('kitchen')">
+                            <div class="flex items-center">
+                                <i class="fas fa-utensils mr-3"></i>
+                                <div>
+                                    <div class="text-sm font-medium">厨房</div>
+                                    <div class="text-xs opacity-75">2个设备 · 已开启</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <span class="text-sm">60%</span>
+                                <i class="fas fa-toggle-on text-lg"></i>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 智能联动设置 -->
+                <section class="px-4 py-4 bg-white mt-2">
+                    <h3 class="text-sm font-medium mb-4">智能联动</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div>
+                                <div class="text-sm font-medium">人体感应</div>
+                                <div class="text-xs text-gray-500">检测到人员自动开灯</div>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" checked class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
+                            </label>
+                        </div>
+                        
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div>
+                                <div class="text-sm font-medium">定时控制</div>
+                                <div class="text-xs text-gray-500">按时间自动调节亮度</div>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" checked class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
+                            </label>
+                        </div>
+                        
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div>
+                                <div class="text-sm font-medium">音乐律动</div>
+                                <div class="text-xs text-gray-500">灯光跟随音乐节拍变化</div>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
+                            </label>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 快捷操作 -->
+                <section class="px-4 py-4 bg-white mt-2">
+                    <div class="grid grid-cols-2 gap-3">
+                        <button class="py-3 px-4 bg-gray-100 text-black rounded-lg font-medium text-center text-sm hover:bg-gray-200 flex items-center justify-center">
+                            <i class="fas fa-power-off mr-2"></i>
+                            全部关闭
+                        </button>
+                        <button class="py-3 px-4 bg-black text-white rounded-lg font-medium text-center text-sm hover:bg-gray-800 flex items-center justify-center">
+                            <i class="fas fa-save mr-2"></i>
+                            保存场景
+                        </button>
+                    </div>
+                </section>
+            </div>
+
+            <!-- 底部导航栏 -->
+            <div class="absolute bottom-0 left-0 right-0 h-[84px] bg-white/80 backdrop-blur-xl border-t border-white/20">
+                <nav class="h-[49px] flex items-center px-2">
+                    <div class="flex justify-around w-full text-[12px]">
+                        <a class="flex flex-col items-center group text-gray-400 hover:text-gray-600 active:text-gray-800 transition-colors" href="home.html">
+                            <div class="transform transition-transform group-hover:scale-110 group-active:scale-95">
+                                <svg class="w-[22px] h-[22px] stroke-[1.5]" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                                </svg>
+                            </div>
+                            <span class="mt-1">首页</span>
+                        </a>
+                        <a class="flex flex-col items-center group text-gray-400 hover:text-gray-600 active:text-gray-800 transition-colors" href="design-result.html">
+                            <div class="transform transition-transform group-hover:scale-110 group-active:scale-95">
+                                <svg class="w-[22px] h-[22px] stroke-[1.5]" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="13.5" cy="6.5" fill="currentColor" r=".5"></circle>
+                                    <circle cx="17.5" cy="10.5" fill="currentColor" r=".5"></circle>
+                                    <circle cx="8.5" cy="7.5" fill="currentColor" r=".5"></circle>
+                                    <circle cx="6.5" cy="12.5" fill="currentColor" r=".5"></circle>
+                                    <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"></path>
+                                </svg>
+                            </div>
+                            <span class="mt-1">设计</span>
+                        </a>
+                        <a class="flex flex-col items-center group text-gray-400 hover:text-gray-600 active:text-gray-800 transition-colors" href="mall.html">
+                            <div class="transform transition-transform group-hover:scale-110 group-active:scale-95">
+                                <svg class="w-[22px] h-[22px] stroke-[1.5]" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                                    <path d="M3 6h18"></path>
+                                    <path d="M16 10a4 4 0 0 1-8 0"></path>
+                                </svg>
+                            </div>
+                            <span class="mt-1">商城</span>
+                        </a>
+                        <a class="flex flex-col items-center group text-black transition-colors" href="spaces.html">
+                            <div class="transform transition-transform group-hover:scale-110 group-active:scale-95">
+                                <svg class="w-[22px] h-[22px] stroke-[1.5]" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="m15 12-8.373 8.373a1 1 0 1 1-3-3L12 9"></path>
+                                    <path d="m18 15 4-4"></path>
+                                    <path d="m21.5 11.5-1.914-1.914A2 2 0 0 1 19 8.172V7l-2.26-2.26a6 6 0 0 0-4.202-1.756L9 2.96l.92.82A6.18 6.18 0 0 1 12 8.4V10l2 2h1.172a2 2 0 0 1 1.414.586L18.5 14.5"></path>
+                                </svg>
+                            </div>
+                            <span class="mt-1">施工</span>
+                        </a>
+                        <a class="flex flex-col items-center group text-gray-400 hover:text-gray-600 active:text-gray-800 transition-colors" href="me.html">
+                            <div class="transform transition-transform group-hover:scale-110 group-active:scale-95">
+                                <svg class="w-[22px] h-[22px] stroke-[1.5]" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                            </div>
+                            <span class="mt-1">我的</span>
+                        </a>
+                    </div>
+                </nav>
+                <!-- iPhone 16 Home Indicator -->
+                <div class="h-[34px] flex items-center justify-center">
+                    <div class="w-[134px] h-[5px] bg-black rounded-full"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 选择场景模式
+        function selectScene(sceneName) {
+            // 移除所有活跃状态
+            document.querySelectorAll('.scene-card').forEach(card => {
+                card.classList.remove('scene-active');
+                card.classList.add('border-gray-200');
+            });
+            
+            // 添加活跃状态到选中的场景
+            event.target.closest('.scene-card').classList.add('scene-active');
+            event.target.closest('.scene-card').classList.remove('border-gray-200');
+            
+            console.log('选择场景:', sceneName);
+        }
+        
+        // 更新亮度
+        function updateBrightness(value) {
+            document.getElementById('brightness-value').textContent = value + '%';
+        }
+        
+        // 更新色温
+        function updateTemperature(value) {
+            document.getElementById('temperature-value').textContent = value + 'K';
+        }
+        
+        // 选择颜色
+        function selectColor(color) {
+            document.querySelectorAll('.color-picker').forEach(picker => {
+                picker.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            console.log('选择颜色:', color);
+        }
+        
+        // 切换房间状态
+        function toggleRoom(roomName) {
+            const roomControl = event.target.closest('.room-control');
+            roomControl.classList.toggle('active');
+            console.log('切换房间:', roomName);
+        }
+    </script>
+</body>
+</html>

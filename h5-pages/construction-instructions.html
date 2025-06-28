@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>施工说明 - 智能设计与施工</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/iphone16_fix.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        .scrollbar-none::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-none {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .phase-card {
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .phase-card:hover {
+            background-color: #f9fafb;
+        }
+
+        .phase-active {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+
+        .phase-pending {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .phase-completed {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+        }
+
+        /* 联系方式弹窗样式 */
+        .contact-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .contact-popup.show {
+            display: flex;
+        }
+
+        .contact-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin: 20px;
+            max-width: 320px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            transform: scale(0.9);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .contact-popup.show .contact-card {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .team-member {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .team-member:hover {
+            background-color: #f9fafb;
+        }
+
+        .role-badge {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 500;
+            margin-left: 8px;
+        }
+
+        .role-manager {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+
+        .role-constructor {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+        }
+
+        .role-supervisor {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+        }
+
+        .role-electrician {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+    </style>
+
+    <!-- 全局错误处理和兜底方案 -->
+    <script>
+        (function() {
+            'use strict';
+            
+            // 创建 Trace 对象的兜底实现
+            window.Trace = window.Trace || {
+                init: function() { console.log('Trace initialized (fallback)'); },
+                log: function() { console.log.apply(console, arguments); },
+                error: function() { console.error.apply(console, arguments); },
+                warn: function() { console.warn.apply(console, arguments); },
+                info: function() { console.info.apply(console, arguments); }
+            };
+
+            // 防止其他可能的调试工具错误
+            window.wx = window.wx || {};
+            window.my = window.my || {};
+            
+            // 防止 chartId 未定义错误
+            window.chartId = window.chartId || 'default-chart-id';
+            
+            // 全局错误处理
+            window.addEventListener('error', function(e) {
+                console.error('Global error caught:', e.error);
+                return true; // 阻止默认错误处理
+            });
+            
+            window.addEventListener('unhandledrejection', function(e) {
+                console.error('Unhandled promise rejection:', e.reason);
+                e.preventDefault(); // 阻止默认处理
+            });
+            
+            console.log('✅ 全局错误处理已初始化');
+        })();
+    </script>
+</head>
+<body class="min-h-screen w-full bg-[#000000] flex items-center justify-center font-system">
+    <!-- iPhone 容器 -->
+    <div class="w-full max-w-[393px] h-[852px] bg-[#1E1E1E] shadow-2xl overflow-hidden relative mx-auto rounded-[54px]">
+        <!-- iPhone 状态栏 -->
+        <div class="w-full h-[47px] bg-black px-5 flex items-center justify-between text-white text-[14px] font-medium">
+            <div class="flex items-center space-x-1">
+                <svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2 20h.01"></path>
+                    <path d="M7 20v-4"></path>
+                    <path d="M12 20v-8"></path>
+                    <path d="M17 20V8"></path>
+                    <path d="M22 4v16"></path>
+                </svg>
+                <span>中国移动</span>
+                <svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 20h.01"></path>
+                    <path d="M2 8.82a15 15 0 0 1 20 0"></path>
+                    <path d="M5 12.859a10 10 0 0 1 14 0"></path>
+                    <path d="M8.5 16.429a5 5 0 0 1 7 0"></path>
+                </svg>
+            </div>
+            <div class="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2">9:41</div>
+            <div class="flex items-center space-x-1">
+                <span>89%</span>
+                <svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
+                    <rect height="10" rx="2" ry="2" width="16" x="2" y="7"></rect>
+                    <line x1="22" x2="22" y1="11" y2="13"></line>
+                </svg>
+            </div>
+        </div>
+
+        <!-- 动态岛 -->
+        <button class="absolute left-1/2 -translate-x-1/2 bg-black transition-all duration-300 ease-out w-[126px] h-[37.5px] -top-0.5 rounded-b-[24px]"></button>
+
+        <!-- 主内容区域 -->
+        <div class="w-full h-[calc(100%-47px)] bg-white overflow-hidden relative">
+            <!-- 滚动内容区域 -->
+            <div class="absolute inset-0 bottom-[84px] overflow-y-auto scrollbar-none">
+                <!-- 顶部导航栏 -->
+                <header class="bg-white border-b border-gray-200">
+                    <div class="flex items-center justify-between px-4 py-3">
+                        <a class="text-black" href="construction-project-detail.html">
+                            <i class="fas fa-arrow-left"></i>
+                        </a>
+                        <h1 class="text-sm font-medium text-black">施工说明</h1>
+                        <a class="text-black" href="#">
+                            <i class="fas fa-download"></i>
+                        </a>
+                    </div>
+                </header>
+
+                <!-- 项目信息 -->
+                <section class="px-4 py-4 bg-gray-50">
+                    <div class="bg-white p-4 rounded-lg">
+                        <h2 class="text-lg font-semibold mb-2">现代简约风智能家居</h2>
+                        <div class="text-sm text-gray-500 mb-1">项目编号: SG2024031501</div>
+                        <div class="text-sm text-gray-500">施工交底文档 · 版本 V1.2</div>
+                    </div>
+                </section>
+
+                <!-- 施工阶段进度 -->
+                <section class="px-4 py-4 bg-white">
+                    <h3 class="text-sm font-medium mb-4">施工阶段</h3>
+                    <div class="space-y-3">
+                        <!-- 交底阶段 -->
+                        <div class="phase-card phase-completed p-4 rounded-lg" onclick="showPhaseDetails('briefing')">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <i class="fas fa-clipboard-check text-xl mr-3"></i>
+                                    <div>
+                                        <div class="text-sm font-medium">交底</div>
+                                        <div class="text-xs opacity-75">技术交底与安全交底</div>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-xs">已完成</div>
+                                    <div class="text-xs opacity-75">2025-05-15</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 施工阶段 -->
+                        <div class="phase-card phase-active p-4 rounded-lg" onclick="showPhaseDetails('construction')">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <i class="fas fa-hammer text-xl mr-3"></i>
+                                    <div>
+                                        <div class="text-sm font-medium">施工</div>
+                                        <div class="text-xs opacity-75">水电改造与设备安装</div>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-xs">进行中</div>
+                                    <div class="text-xs opacity-75">65%</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 安装阶段 -->
+                        <div class="phase-card phase-pending p-4 rounded-lg" onclick="showPhaseDetails('installation')">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <i class="fas fa-cog text-xl mr-3"></i>
+                                    <div>
+                                        <div class="text-sm font-medium">安装</div>
+                                        <div class="text-xs opacity-75">智能设备安装配置</div>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-xs">待开始</div>
+                                    <div class="text-xs opacity-75">预计6-20</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 调试阶段 -->
+                        <div class="phase-card phase-pending p-4 rounded-lg" onclick="showPhaseDetails('debugging')">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <i class="fas fa-wrench text-xl mr-3"></i>
+                                    <div>
+                                        <div class="text-sm font-medium">调试</div>
+                                        <div class="text-xs opacity-75">系统联调与功能测试</div>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-xs">待开始</div>
+                                    <div class="text-xs opacity-75">预计6-25</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 售后阶段 -->
+                        <div class="phase-card phase-pending p-4 rounded-lg" onclick="showPhaseDetails('service')">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <i class="fas fa-headset text-xl mr-3"></i>
+                                    <div>
+                                        <div class="text-sm font-medium">售后</div>
+                                        <div class="text-xs opacity-75">验收交付与维护服务</div>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-xs">待开始</div>
+                                    <div class="text-xs opacity-75">预计6-30</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 当前阶段详情 -->
+                <section class="px-4 py-4 bg-white mt-2">
+                    <h3 class="text-sm font-medium mb-4">当前阶段：施工</h3>
+
+                    <!-- 施工要求 -->
+                    <div class="mb-4">
+                        <h4 class="text-sm font-medium mb-2">施工要求</h4>
+                        <div class="space-y-2 text-sm text-gray-600">
+                            <div class="flex items-start">
+                                <i class="fas fa-check-circle text-green-500 mr-2 mt-0.5"></i>
+                                <span>严格按照图纸进行水电改造，不得随意更改线路走向</span>
+                            </div>
+                            <div class="flex items-start">
+                                <i class="fas fa-check-circle text-green-500 mr-2 mt-0.5"></i>
+                                <span>强弱电线路需分开布置，间距不少于30cm</span>
+                            </div>
+                            <div class="flex items-start">
+                                <i class="fas fa-check-circle text-green-500 mr-2 mt-0.5"></i>
+                                <span>所有线管接头必须使用专用接头，确保密封性</span>
+                            </div>
+                            <div class="flex items-start">
+                                <i class="fas fa-check-circle text-green-500 mr-2 mt-0.5"></i>
+                                <span>预留智能设备安装位置，确保后期安装便利</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 安全注意事项 -->
+                    <div class="mb-4">
+                        <h4 class="text-sm font-medium mb-2">安全注意事项</h4>
+                        <div class="space-y-2 text-sm text-gray-600">
+                            <div class="flex items-start">
+                                <i class="fas fa-exclamation-triangle text-yellow-500 mr-2 mt-0.5"></i>
+                                <span>施工前必须断电，确认无电后方可作业</span>
+                            </div>
+                            <div class="flex items-start">
+                                <i class="fas fa-exclamation-triangle text-yellow-500 mr-2 mt-0.5"></i>
+                                <span>使用合格的防护用品，戴好安全帽</span>
+                            </div>
+                            <div class="flex items-start">
+                                <i class="fas fa-exclamation-triangle text-yellow-500 mr-2 mt-0.5"></i>
+                                <span>严禁在雨天进行室外电气作业</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 质量标准 -->
+                    <div>
+                        <h4 class="text-sm font-medium mb-2">质量标准</h4>
+                        <div class="space-y-2 text-sm text-gray-600">
+                            <div class="flex items-start">
+                                <i class="fas fa-star text-blue-500 mr-2 mt-0.5"></i>
+                                <span>线路绝缘电阻不小于0.5MΩ</span>
+                            </div>
+                            <div class="flex items-start">
+                                <i class="fas fa-star text-blue-500 mr-2 mt-0.5"></i>
+                                <span>接地电阻不大于4Ω</span>
+                            </div>
+                            <div class="flex items-start">
+                                <i class="fas fa-star text-blue-500 mr-2 mt-0.5"></i>
+                                <span>线管弯曲半径不小于管径的6倍</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 阶段负责人员 -->
+                <section class="px-4 py-4 bg-white mt-2">
+                    <h3 class="text-sm font-medium mb-4">阶段负责人员</h3>
+                    <div class="space-y-3">
+                        <!-- 项目经理 -->
+                        <div class="team-member p-3 rounded-lg border border-gray-100" onclick="showContactInfo('张经理', '项目经理', '13888888888', '负责项目整体协调管理', 'manager')">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-green-100 rounded-full mr-3 flex items-center justify-center">
+                                    <i class="fas fa-user-tie text-green-600"></i>
+                                </div>
+                                <div class="flex-grow">
+                                    <div class="flex items-center">
+                                        <span class="text-sm font-medium">张经理</span>
+                                        <span class="role-badge role-manager">项目经理</span>
+                                    </div>
+                                    <div class="text-xs text-gray-500 mt-1">负责项目整体协调管理</div>
+                                </div>
+                                <i class="fas fa-chevron-right text-gray-400"></i>
+                            </div>
+                        </div>
+
+                        <!-- 施工队长 -->
+                        <div class="team-member p-3 rounded-lg border border-gray-100" onclick="showContactInfo('李队长', '施工队长', '13999999999', '负责现场施工管理', 'constructor')">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-orange-100 rounded-full mr-3 flex items-center justify-center">
+                                    <i class="fas fa-hammer text-orange-600"></i>
+                                </div>
+                                <div class="flex-grow">
+                                    <div class="flex items-center">
+                                        <span class="text-sm font-medium">李队长</span>
+                                        <span class="role-badge role-constructor">施工队长</span>
+                                    </div>
+                                    <div class="text-xs text-gray-500 mt-1">负责现场施工管理</div>
+                                </div>
+                                <i class="fas fa-chevron-right text-gray-400"></i>
+                            </div>
+                        </div>
+
+                        <!-- 质量监理 -->
+                        <div class="team-member p-3 rounded-lg border border-gray-100" onclick="showContactInfo('王监理', '质量监理', '13777777777', '负责施工质量监督', 'supervisor')">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-purple-100 rounded-full mr-3 flex items-center justify-center">
+                                    <i class="fas fa-clipboard-check text-purple-600"></i>
+                                </div>
+                                <div class="flex-grow">
+                                    <div class="flex items-center">
+                                        <span class="text-sm font-medium">王监理</span>
+                                        <span class="role-badge role-supervisor">质量监理</span>
+                                    </div>
+                                    <div class="text-xs text-gray-500 mt-1">负责施工质量监督</div>
+                                </div>
+                                <i class="fas fa-chevron-right text-gray-400"></i>
+                            </div>
+                        </div>
+
+                        <!-- 电工师傅 -->
+                        <div class="team-member p-3 rounded-lg border border-gray-100" onclick="showContactInfo('赵师傅', '电工师傅', '13666666666', '负责电气安装施工', 'electrician')">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-red-100 rounded-full mr-3 flex items-center justify-center">
+                                    <i class="fas fa-bolt text-red-600"></i>
+                                </div>
+                                <div class="flex-grow">
+                                    <div class="flex items-center">
+                                        <span class="text-sm font-medium">赵师傅</span>
+                                        <span class="role-badge role-electrician">电工师傅</span>
+                                    </div>
+                                    <div class="text-xs text-gray-500 mt-1">负责电气安装施工</div>
+                                </div>
+                                <i class="fas fa-chevron-right text-gray-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 施工进度记录 -->
+                <section class="px-4 py-4 bg-white mt-2">
+                    <h3 class="text-sm font-medium mb-4">施工进度记录</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-start p-3 bg-green-50 rounded-lg">
+                            <i class="fas fa-check-circle text-green-500 mr-3 mt-1"></i>
+                            <div class="flex-grow">
+                                <div class="text-sm font-medium">水电定位完成</div>
+                                <div class="text-xs text-gray-500">2025-06-12 14:30 · 张经理</div>
+                                <div class="text-xs text-gray-600 mt-1">所有点位已确认，符合设计要求</div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start p-3 bg-blue-50 rounded-lg">
+                            <i class="fas fa-clock text-blue-500 mr-3 mt-1"></i>
+                            <div class="flex-grow">
+                                <div class="text-sm font-medium">开槽作业进行中</div>
+                                <div class="text-xs text-gray-500">2025-06-13 09:00 · 李队长</div>
+                                <div class="text-xs text-gray-600 mt-1">客厅区域开槽完成，卧室区域进行中</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 操作按钮 -->
+                <section class="px-4 py-4 bg-white mt-2">
+                    <div class="grid grid-cols-2 gap-3">
+                        <button class="py-3 px-4 bg-gray-100 text-black rounded-lg font-medium text-center text-sm hover:bg-gray-200 flex items-center justify-center">
+                            <i class="fas fa-camera mr-2"></i>
+                            现场拍照
+                        </button>
+                        <button class="py-3 px-4 bg-black text-white rounded-lg font-medium text-center text-sm hover:bg-gray-800 flex items-center justify-center">
+                            <i class="fas fa-plus mr-2"></i>
+                            添加记录
+                        </button>
+                    </div>
+                </section>
+            </div>
+
+            <!-- 底部导航栏 -->
+            <div class="absolute bottom-0 left-0 right-0 h-[84px] bg-white/80 backdrop-blur-xl border-t border-white/20">
+                <nav class="h-[49px] flex items-center px-2">
+                    <div class="flex justify-around w-full text-[12px]">
+                        <a class="flex flex-col items-center group text-gray-400 hover:text-gray-600 active:text-gray-800 transition-colors" href="home.html">
+                            <div class="transform transition-transform group-hover:scale-110 group-active:scale-95">
+                                <svg class="w-[22px] h-[22px] stroke-[1.5]" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                                </svg>
+                            </div>
+                            <span class="mt-1">首页</span>
+                        </a>
+                        <a class="flex flex-col items-center group text-gray-400 hover:text-gray-600 active:text-gray-800 transition-colors" href="design-result.html">
+                            <div class="transform transition-transform group-hover:scale-110 group-active:scale-95">
+                                <svg class="w-[22px] h-[22px] stroke-[1.5]" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="13.5" cy="6.5" fill="currentColor" r=".5"></circle>
+                                    <circle cx="17.5" cy="10.5" fill="currentColor" r=".5"></circle>
+                                    <circle cx="8.5" cy="7.5" fill="currentColor" r=".5"></circle>
+                                    <circle cx="6.5" cy="12.5" fill="currentColor" r=".5"></circle>
+                                    <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"></path>
+                                </svg>
+                            </div>
+                            <span class="mt-1">设计</span>
+                        </a>
+                        <a class="flex flex-col items-center group text-gray-400 hover:text-gray-600 active:text-gray-800 transition-colors" href="mall.html">
+                            <div class="transform transition-transform group-hover:scale-110 group-active:scale-95">
+                                <svg class="w-[22px] h-[22px] stroke-[1.5]" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                                    <path d="M3 6h18"></path>
+                                    <path d="M16 10a4 4 0 0 1-8 0"></path>
+                                </svg>
+                            </div>
+                            <span class="mt-1">商城</span>
+                        </a>
+                        <a class="flex flex-col items-center group text-black transition-colors" href="spaces.html">
+                            <div class="transform transition-transform group-hover:scale-110 group-active:scale-95">
+                                <svg class="w-[22px] h-[22px] stroke-[1.5]" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="m15 12-8.373 8.373a1 1 0 1 1-3-3L12 9"></path>
+                                    <path d="m18 15 4-4"></path>
+                                    <path d="m21.5 11.5-1.914-1.914A2 2 0 0 1 19 8.172V7l-2.26-2.26a6 6 0 0 0-4.202-1.756L9 2.96l.92.82A6.18 6.18 0 0 1 12 8.4V10l2 2h1.172a2 2 0 0 1 1.414.586L18.5 14.5"></path>
+                                </svg>
+                            </div>
+                            <span class="mt-1">施工</span>
+                        </a>
+                        <a class="flex flex-col items-center group text-gray-400 hover:text-gray-600 active:text-gray-800 transition-colors" href="me.html">
+                            <div class="transform transition-transform group-hover:scale-110 group-active:scale-95">
+                                <svg class="w-[22px] h-[22px] stroke-[1.5]" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                            </div>
+                            <span class="mt-1">我的</span>
+                        </a>
+                    </div>
+                </nav>
+                <!-- iPhone 16 Home Indicator -->
+                <div class="h-[34px] flex items-center justify-center">
+                    <div class="w-[134px] h-[5px] bg-black rounded-full"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 联系方式弹窗 -->
+    <div id="contactPopup" class="contact-popup">
+        <div class="contact-card">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold">联系信息</h3>
+                <button onclick="hideContactInfo()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-gray-100 rounded-full mx-auto mb-3 flex items-center justify-center" id="contactAvatar">
+                    <i class="fas fa-user text-gray-500 text-xl"></i>
+                </div>
+                <div class="text-lg font-medium" id="contactNameDisplay">张经理</div>
+                <div class="text-sm text-gray-500" id="contactRole">项目经理</div>
+                <div class="text-xs text-gray-400 mt-1" id="contactDescription">负责项目整体协调管理</div>
+            </div>
+
+            <div class="space-y-3">
+                <!-- 电话联系 -->
+                <div class="flex items-center p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100" onclick="callContact()">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-phone text-green-600"></i>
+                    </div>
+                    <div class="flex-grow">
+                        <div class="text-sm font-medium">电话联系</div>
+                        <div class="text-sm text-gray-600" id="contactPhone">13888888888</div>
+                    </div>
+                    <i class="fas fa-chevron-right text-gray-400"></i>
+                </div>
+
+                <!-- 微信联系 -->
+                <div class="flex items-center p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100" onclick="addWechat()">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                        <i class="fab fa-weixin text-green-600"></i>
+                    </div>
+                    <div class="flex-grow">
+                        <div class="text-sm font-medium">微信联系</div>
+                        <div class="text-sm text-gray-600">点击添加微信</div>
+                    </div>
+                    <i class="fas fa-chevron-right text-gray-400"></i>
+                </div>
+
+                <!-- 发送消息 -->
+                <div class="flex items-center p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100" onclick="sendMessage()">
+                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-comment text-blue-600"></i>
+                    </div>
+                    <div class="flex-grow">
+                        <div class="text-sm font-medium">发送消息</div>
+                        <div class="text-sm text-gray-600">项目内部沟通</div>
+                    </div>
+                    <i class="fas fa-chevron-right text-gray-400"></i>
+                </div>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-gray-100">
+                <button onclick="hideContactInfo()" class="w-full py-2 text-gray-500 hover:text-gray-700 text-sm">
+                    关闭
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 显示阶段详情
+        function showPhaseDetails(phase) {
+            alert(`查看${phase}阶段详情`);
+            // 这里可以实现阶段详情展示功能
+        }
+
+        // 显示联系信息弹窗
+        function showContactInfo(name, role, phone, description, roleType) {
+            document.getElementById('contactNameDisplay').textContent = name;
+            document.getElementById('contactRole').textContent = role;
+            document.getElementById('contactPhone').textContent = phone;
+            document.getElementById('contactDescription').textContent = description;
+
+            // 根据角色设置头像图标和颜色
+            const avatar = document.getElementById('contactAvatar');
+            avatar.innerHTML = '';
+
+            switch(roleType) {
+                case 'manager':
+                    avatar.className = 'w-16 h-16 bg-green-100 rounded-full mx-auto mb-3 flex items-center justify-center';
+                    avatar.innerHTML = '<i class="fas fa-user-tie text-green-600 text-xl"></i>';
+                    break;
+                case 'constructor':
+                    avatar.className = 'w-16 h-16 bg-orange-100 rounded-full mx-auto mb-3 flex items-center justify-center';
+                    avatar.innerHTML = '<i class="fas fa-hammer text-orange-600 text-xl"></i>';
+                    break;
+                case 'supervisor':
+                    avatar.className = 'w-16 h-16 bg-purple-100 rounded-full mx-auto mb-3 flex items-center justify-center';
+                    avatar.innerHTML = '<i class="fas fa-clipboard-check text-purple-600 text-xl"></i>';
+                    break;
+                case 'electrician':
+                    avatar.className = 'w-16 h-16 bg-red-100 rounded-full mx-auto mb-3 flex items-center justify-center';
+                    avatar.innerHTML = '<i class="fas fa-bolt text-red-600 text-xl"></i>';
+                    break;
+                default:
+                    avatar.className = 'w-16 h-16 bg-gray-100 rounded-full mx-auto mb-3 flex items-center justify-center';
+                    avatar.innerHTML = '<i class="fas fa-user text-gray-500 text-xl"></i>';
+            }
+
+            document.getElementById('contactPopup').classList.add('show');
+        }
+
+        // 隐藏联系信息弹窗
+        function hideContactInfo() {
+            document.getElementById('contactPopup').classList.remove('show');
+        }
+
+        // 拨打电话
+        function callContact() {
+            const phone = document.getElementById('contactPhone').textContent;
+            const name = document.getElementById('contactNameDisplay').textContent;
+            if (confirm(`确定要拨打 ${name} 的电话 ${phone} 吗？`)) {
+                window.location.href = `tel:${phone}`;
+            }
+        }
+
+        // 添加微信
+        function addWechat() {
+            const name = document.getElementById('contactNameDisplay').textContent;
+            alert(`正在跳转到微信添加 ${name} 为联系人...`);
+        }
+
+        // 发送消息
+        function sendMessage() {
+            const name = document.getElementById('contactNameDisplay').textContent;
+            alert(`正在打开与 ${name} 的项目内部聊天...`);
+        }
+
+        // 点击弹窗背景关闭
+        document.getElementById('contactPopup').addEventListener('click', function(e) {
+            if (e.target === this) {
+                hideContactInfo();
+            }
+        });
+    </script>
+</body>
+</html>

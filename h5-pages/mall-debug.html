@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mall.html滚动诊断</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 复制mall.html中的关键样式 */
+        .youpin-tab-container {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .youpin-tab-scrollable {
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            width: 100%;
+            border: 2px solid red; /* 调试边框 */
+        }
+        
+        .youpin-tab-scrollable::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .youpin-tab-wrapper {
+            display: flex;
+            width: max-content;
+            min-width: 100%;
+            padding: 0 16px;
+            border: 2px solid blue; /* 调试边框 */
+        }
+        
+        .youpin-tab-indicator-left,
+        .youpin-tab-indicator-right {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 32px;
+            pointer-events: none;
+            z-index: 10;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .show {
+            opacity: 1 !important;
+        }
+
+        .youpin-tab {
+            flex-shrink: 0;
+            padding: 12px 16px;
+            font-size: 14px;
+            color: #666666;
+            background: #f0f0f0; /* 调试背景 */
+            border: 1px solid #ccc; /* 调试边框 */
+            border-bottom: 2px solid transparent;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-right: 4px; /* 调试间距 */
+        }
+        
+        .youpin-tab:hover {
+            color: #000000;
+            background: #e0e0e0;
+        }
+        
+        .youpin-tab.active {
+            color: #000000;
+            border-bottom-color: #000000;
+            font-weight: 600;
+            background: #d0d0d0;
+        }
+    </style>
+</head>
+<body class="p-4">
+    <h1 class="text-2xl font-bold mb-4">Mall.html滚动诊断页面</h1>
+    
+    <!-- 诊断信息显示 -->
+    <div class="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded">
+        <h2 class="font-semibold mb-2">诊断信息：</h2>
+        <div id="diagnostic-info" class="text-sm font-mono"></div>
+    </div>
+    
+    <!-- 复制mall.html的分类导航结构 -->
+    <section class="bg-white border border-gray-200 rounded">
+        <div class="youpin-tab-container relative">
+            <!-- 左侧滚动指示器 -->
+            <div id="categoryLeftIndicator" class="youpin-tab-indicator-left absolute top-0 bottom-0 left-0 bg-gradient-to-r from-white to-transparent"></div>
+            <!-- 右侧滚动指示器 -->
+            <div id="categoryRightIndicator" class="youpin-tab-indicator-right absolute top-0 bottom-0 right-0 bg-gradient-to-l from-white to-transparent"></div>
+
+            <div id="categoryScrollable" class="youpin-tab-scrollable">
+                <div class="youpin-tab-wrapper">
+                    <button class="youpin-tab active" data-category="all">全部</button>
+                    <button class="youpin-tab" data-category="gateway">网关</button>
+                    <button class="youpin-tab" data-category="switch">开关</button>
+                    <button class="youpin-tab" data-category="lighting">灯具</button>
+                    <button class="youpin-tab" data-category="curtain">窗帘</button>
+                    <button class="youpin-tab" data-category="sensor">传感器</button>
+                    <button class="youpin-tab" data-category="security">安防监控</button>
+                    <button class="youpin-tab" data-category="appliance">家电控制</button>
+                    <button class="youpin-tab" data-category="audio">音响设备</button>
+                    <button class="youpin-tab" data-category="climate">环境控制</button>
+                    <button class="youpin-tab" data-category="kitchen">厨房电器</button>
+                    <button class="youpin-tab" data-category="bathroom">卫浴设备</button>
+                    <button class="youpin-tab" data-category="bedroom">卧室用品</button>
+                    <button class="youpin-tab" data-category="living">客厅设备</button>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 实时状态 -->
+    <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded">
+        <h2 class="font-semibold mb-2">实时状态：</h2>
+        <div id="real-time-status" class="text-sm font-mono"></div>
+    </div>
+    
+    <!-- 手动测试按钮 -->
+    <div class="mt-6 space-x-4">
+        <button id="force-scroll" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+            强制滚动到右侧
+        </button>
+        <button id="reset-scroll" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
+            重置滚动位置
+        </button>
+        <button id="toggle-width" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+            切换容器宽度
+        </button>
+    </div>
+
+    <script>
+        // 复制mall.html的JavaScript逻辑
+        function initCategoryScrolling() {
+            console.log('🔧 诊断页面：初始化分类导航滚动功能...');
+            
+            const tabsContainer = document.querySelector('.youpin-tab-container');
+            const scrollable = document.getElementById('categoryScrollable');
+            const leftIndicator = document.getElementById('categoryLeftIndicator');
+            const rightIndicator = document.getElementById('categoryRightIndicator');
+            
+            const diagnosticInfo = document.getElementById('diagnostic-info');
+            const realTimeStatus = document.getElementById('real-time-status');
+            
+            console.log('📍 DOM元素检查:', {
+                tabsContainer: !!tabsContainer,
+                scrollable: !!scrollable,
+                leftIndicator: !!leftIndicator,
+                rightIndicator: !!rightIndicator
+            });
+            
+            if (!scrollable) {
+                diagnosticInfo.innerHTML = '❌ 错误：未找到categoryScrollable元素';
+                return;
+            }
+            
+            // 添加滚动事件监听
+            scrollable.addEventListener('scroll', function() {
+                updateTabIndicators();
+                updateRealTimeStatus();
+            });
+            
+            // 窗口大小变化时也更新指示器
+            window.addEventListener('resize', updateTabIndicators);
+            
+            // 初始诊断
+            setTimeout(() => {
+                updateTabIndicators();
+                updateDiagnosticInfo();
+                updateRealTimeStatus();
+            }, 100);
+            
+            // 添加tab点击事件
+            const tabs = document.querySelectorAll('.youpin-tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    console.log('🎯 切换到分类:', this.dataset.category);
+                });
+            });
+            
+            function updateTabIndicators() {
+                if (!leftIndicator || !rightIndicator) return;
+                
+                const scrollPos = scrollable.scrollLeft;
+                const maxScroll = scrollable.scrollWidth - scrollable.clientWidth;
+                
+                // 左侧指示器
+                if (scrollPos > 0) {
+                    leftIndicator.classList.add('show');
+                } else {
+                    leftIndicator.classList.remove('show');
+                }
+                
+                // 右侧指示器
+                if (scrollPos < maxScroll - 1) {
+                    rightIndicator.classList.add('show');
+                } else {
+                    rightIndicator.classList.remove('show');
+                }
+            }
+            
+            function updateDiagnosticInfo() {
+                const wrapper = scrollable.querySelector('.youpin-tab-wrapper');
+                const tabs = scrollable.querySelectorAll('.youpin-tab');
+                
+                diagnosticInfo.innerHTML = `
+                    容器宽度: ${scrollable.clientWidth}px<br>
+                    内容宽度: ${scrollable.scrollWidth}px<br>
+                    包装器宽度: ${wrapper ? wrapper.offsetWidth : 'N/A'}px<br>
+                    Tab数量: ${tabs.length}<br>
+                    需要滚动: ${scrollable.scrollWidth > scrollable.clientWidth ? '是' : '否'}<br>
+                    最大滚动: ${scrollable.scrollWidth - scrollable.clientWidth}px
+                `;
+            }
+            
+            function updateRealTimeStatus() {
+                const scrollPos = scrollable.scrollLeft;
+                const maxScroll = scrollable.scrollWidth - scrollable.clientWidth;
+                
+                realTimeStatus.innerHTML = `
+                    当前滚动位置: ${Math.round(scrollPos)}px<br>
+                    最大滚动位置: ${Math.round(maxScroll)}px<br>
+                    左指示器: ${leftIndicator.classList.contains('show') ? '显示' : '隐藏'}<br>
+                    右指示器: ${rightIndicator.classList.contains('show') ? '显示' : '隐藏'}
+                `;
+            }
+            
+            // 手动测试按钮
+            document.getElementById('force-scroll').addEventListener('click', () => {
+                scrollable.scrollTo({ left: 200, behavior: 'smooth' });
+            });
+            
+            document.getElementById('reset-scroll').addEventListener('click', () => {
+                scrollable.scrollTo({ left: 0, behavior: 'smooth' });
+            });
+            
+            document.getElementById('toggle-width').addEventListener('click', () => {
+                const wrapper = scrollable.querySelector('.youpin-tab-wrapper');
+                if (wrapper.style.width) {
+                    wrapper.style.width = '';
+                } else {
+                    wrapper.style.width = '800px';
+                }
+                setTimeout(() => {
+                    updateTabIndicators();
+                    updateDiagnosticInfo();
+                    updateRealTimeStatus();
+                }, 100);
+            });
+            
+            console.log('✅ 诊断页面：分类导航滚动功能初始化完成');
+        }
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initCategoryScrolling();
+        });
+    </script>
+</body>
+</html>
