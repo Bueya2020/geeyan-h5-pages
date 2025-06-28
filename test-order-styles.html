@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>订单样式测试</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'system': ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Text"', '"SF Pro Icons"', '"Helvetica Neue"', 'Helvetica', 'Arial', 'sans-serif']
+                    },
+                    colors: {
+                        'primary-text': '#1A1A1A',
+                        'main-bg': '#F8F9FA'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        }
+
+        /* 订单类型标签样式 */
+        .order-type-mall {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .order-type-design {
+            background-color: #f3e8ff;
+            color: #7c3aed;
+        }
+        
+        .order-type-knowledge {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+
+        .order-status {
+            transition: all 0.2s;
+        }
+        
+        .order-status.paid {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+        
+        .order-status.shipped {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .order-status.delivered {
+            background-color: #f3e8ff;
+            color: #7c3aed;
+        }
+    </style>
+</head>
+<body class="min-h-screen w-full bg-[#000000] flex items-center justify-center font-system">
+    <!-- iPhone 容器 -->
+    <div class="w-full max-w-[393px] h-[852px] bg-[#1E1E1E] shadow-2xl overflow-hidden relative mx-auto rounded-[54px]">
+        <!-- iPhone 状态栏 -->
+        <div class="w-full h-[47px] bg-black px-5 flex items-center justify-between text-white text-[14px] font-medium">
+            <div class="flex items-center space-x-1">
+                <span>中国移动</span>
+            </div>
+            <div class="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2">9:41</div>
+            <div class="flex items-center space-x-1">
+                <span>89%</span>
+            </div>
+        </div>
+
+        <!-- 动态岛 -->
+        <button class="absolute left-1/2 -translate-x-1/2 bg-black transition-all duration-300 ease-out w-[126px] h-[37.5px] -top-0.5 rounded-b-[24px]"></button>
+
+        <!-- 主内容区域 -->
+        <div class="w-full h-[calc(100%-47px)] bg-white overflow-hidden relative">
+            <!-- 滚动内容区域 -->
+            <div class="absolute inset-0 bottom-[84px] overflow-y-auto scrollbar-none">
+
+                <!-- 顶部导航栏 -->
+                <header class="bg-white border-b border-gray-100 sticky top-0 z-10">
+                    <div class="flex items-center justify-between px-4 py-3">
+                        <a href="javascript:history.back()" class="text-black hover:text-gray-600 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m15 18-6-6 6-6"></path>
+                            </svg>
+                        </a>
+                        <h1 class="text-[16px] font-medium text-black">订单样式测试</h1>
+                        <div class="w-5"></div>
+                    </div>
+                </header>
+
+                <!-- 订单类型筛选 -->
+                <section class="bg-white px-4 py-3 border-b border-gray-50">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-[13px] font-medium text-gray-900">订单类型:</span>
+                        <select class="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-[13px] bg-white focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
+                            <option value="all">全部订单</option>
+                            <option value="mall">商城订单 (SH)</option>
+                            <option value="design">设计订单 (DS)</option>
+                            <option value="knowledge">知识订单 (KN)</option>
+                        </select>
+                    </div>
+                </section>
+
+                <!-- 订单状态筛选 -->
+                <section class="bg-white px-4 py-3 border-b border-gray-50">
+                    <div class="flex space-x-3 text-[13px]">
+                        <button class="px-3 py-1.5 rounded-xl transition-all shadow-[0_2px_8px_rgba(0,0,0,0.06)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] bg-black text-white">全部</button>
+                        <button class="px-3 py-1.5 rounded-xl transition-all hover:bg-gray-50 active:bg-gray-100 text-gray-600">已付款</button>
+                        <button class="px-3 py-1.5 rounded-xl transition-all hover:bg-gray-50 active:bg-gray-100 text-gray-600">已发货</button>
+                        <button class="px-3 py-1.5 rounded-xl transition-all hover:bg-gray-50 active:bg-gray-100 text-gray-600">已送达</button>
+                    </div>
+                </section>
+
+                <!-- 测试订单卡片 -->
+                <section class="bg-[#F8F9FA] px-3 py-2">
+                    <!-- 商城订单示例 -->
+                    <div class="bg-white rounded-xl mb-3 p-4 shadow-[0_2px_8px_rgba(0,0,0,0.06)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] transition-all">
+                        <div class="flex justify-between items-center mb-3">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-[11px] text-gray-500">订单号: SH20250127001</span>
+                                <span class="px-2 py-1 order-type-mall rounded-lg text-[11px] font-medium">
+                                    商城订单
+                                </span>
+                            </div>
+                            <span class="order-status paid px-2 py-1 rounded-lg text-[11px] font-medium">已付款</span>
+                        </div>
+                        
+                        <div class="space-y-3 mb-3">
+                            <div class="flex items-center space-x-3">
+                                <img src="https://via.placeholder.com/48x48?text=商品" alt="商品" class="w-12 h-12 object-cover rounded-lg shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
+                                <div class="flex-1">
+                                    <h4 class="text-[13px] font-medium text-[#1A1A1A] mb-1">小米智能开关</h4>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-[11px] text-gray-500">¥299 x2</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-between items-center pt-3 border-t border-gray-50">
+                            <div class="text-[11px] text-gray-500">2天前</div>
+                            <div class="text-right">
+                                <div class="text-[11px] text-gray-500">共2件商品</div>
+                                <div class="text-[13px] font-medium text-[#1A1A1A]">合计: ¥598</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 设计订单示例 -->
+                    <div class="bg-white rounded-xl mb-3 p-4 shadow-[0_2px_8px_rgba(0,0,0,0.06)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] transition-all">
+                        <div class="flex justify-between items-center mb-3">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-[11px] text-gray-500">订单号: DS20250127002</span>
+                                <span class="px-2 py-1 order-type-design rounded-lg text-[11px] font-medium">
+                                    设计订单
+                                </span>
+                            </div>
+                            <span class="order-status shipped px-2 py-1 rounded-lg text-[11px] font-medium">设计中</span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <h4 class="text-[13px] font-medium text-[#1A1A1A] mb-2">三室两厅智能家居设计</h4>
+                            <div class="text-[11px] text-gray-500 space-y-1 mb-3 bg-[#F8F9FA] rounded-lg p-2">
+                                <div>户型: 3室2厅2卫</div>
+                                <div>面积: 120㎡</div>
+                            </div>
+                            
+                            <div class="mt-2">
+                                <div class="flex justify-between text-[11px] text-gray-500 mb-2">
+                                    <span>设计进度</span>
+                                    <span class="font-medium">40%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-black h-2 rounded-full transition-all" style="width: 40%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-between items-center pt-3 border-t border-gray-50">
+                            <div class="text-[11px] text-gray-500">3天前</div>
+                            <div class="text-right">
+                                <div class="text-[11px] text-gray-500">共1件商品</div>
+                                <div class="text-[13px] font-medium text-[#1A1A1A]">合计: ¥2999</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 知识库订单示例 -->
+                    <div class="bg-white rounded-xl mb-3 p-4 shadow-[0_2px_8px_rgba(0,0,0,0.06)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] transition-all">
+                        <div class="flex justify-between items-center mb-3">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-[11px] text-gray-500">订单号: KN20250127003</span>
+                                <span class="px-2 py-1 order-type-knowledge rounded-lg text-[11px] font-medium">
+                                    知识订单
+                                </span>
+                            </div>
+                            <span class="order-status delivered px-2 py-1 rounded-lg text-[11px] font-medium">学习中</span>
+                        </div>
+                        
+                        <div class="space-y-3 mb-3">
+                            <div class="flex items-center space-x-3">
+                                <img src="https://via.placeholder.com/48x48?text=课程" alt="课程" class="w-12 h-12 object-cover rounded-lg shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
+                                <div class="flex-1">
+                                    <h4 class="text-[13px] font-medium text-[#1A1A1A] mb-1">智能家居入门课程</h4>
+                                    <div class="mt-2">
+                                        <div class="flex justify-between text-[11px] text-gray-500 mb-1">
+                                            <span>学习进度</span>
+                                            <span class="font-medium">60%</span>
+                                        </div>
+                                        <div class="w-full bg-gray-200 rounded-full h-1.5">
+                                            <div class="bg-green-600 h-1.5 rounded-full transition-all" style="width: 60%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-between items-center pt-3 border-t border-gray-50">
+                            <div class="text-[11px] text-gray-500">5天前</div>
+                            <div class="text-right">
+                                <div class="text-[11px] text-gray-500">共1件商品</div>
+                                <div class="text-[13px] font-medium text-[#1A1A1A]">合计: ¥199</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- 底部导航栏 -->
+            <div class="absolute bottom-0 left-0 right-0 h-[84px] bg-white/80 backdrop-blur-xl border-t border-white/20">
+                <nav class="h-[49px] flex items-center px-2">
+                    <div class="flex justify-around w-full text-[12px]">
+                        <a class="flex flex-col items-center group text-gray-400" href="#">
+                            <span class="mt-1">首页</span>
+                        </a>
+                        <a class="flex flex-col items-center group text-gray-400" href="#">
+                            <span class="mt-1">设计</span>
+                        </a>
+                        <a class="flex flex-col items-center group text-black" href="#">
+                            <span class="mt-1">商城</span>
+                        </a>
+                        <a class="flex flex-col items-center group text-gray-400" href="#">
+                            <span class="mt-1">施工</span>
+                        </a>
+                        <a class="flex flex-col items-center group text-gray-400" href="#">
+                            <span class="mt-1">我的</span>
+                        </a>
+                    </div>
+                </nav>
+                <!-- iPhone 16 Home Indicator -->
+                <div class="h-[34px] flex items-center justify-center">
+                    <div class="w-[134px] h-[5px] bg-white rounded-full"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

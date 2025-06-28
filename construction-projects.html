@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>我的项目 - 智能设计与施工</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/iphone16_fix.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        .project-card {
+            transition: transform 0.2s;
+        }
+        .project-card:active {
+            transform: scale(0.98);
+        }
+        .btn-primary {
+            transition: background-color 0.2s;
+        }
+        .btn-primary:active {
+            background-color: #333;
+        }
+        .scrollbar-none::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-none {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+
+    <!-- 全局错误处理和兜底方案 -->
+    <script>
+        (function() {
+            'use strict';
+            
+            // 创建 Trace 对象的兜底实现
+            window.Trace = window.Trace || {
+                init: function() { console.log('Trace initialized (fallback)'); },
+                log: function() { console.log.apply(console, arguments); },
+                error: function() { console.error.apply(console, arguments); },
+                warn: function() { console.warn.apply(console, arguments); },
+                info: function() { console.info.apply(console, arguments); }
+            };
+
+            // 防止其他可能的调试工具错误
+            window.wx = window.wx || {};
+            window.my = window.my || {};
+            
+            // 防止 chartId 未定义错误
+            window.chartId = window.chartId || 'default-chart-id';
+            
+            // 全局错误处理
+            window.addEventListener('error', function(e) {
+                console.error('Global error caught:', e.error);
+                return true; // 阻止默认错误处理
+            });
+            
+            window.addEventListener('unhandledrejection', function(e) {
+                console.error('Unhandled promise rejection:', e.reason);
+                e.preventDefault(); // 阻止默认处理
+            });
+            
+            console.log('✅ 全局错误处理已初始化');
+        })();
+    </script>
+</head>
+<body class="min-h-screen w-full bg-[#000000] flex items-center justify-center font-system">
+    <!-- iPhone 容器 -->
+    <div class="w-full max-w-[393px] h-[852px] bg-[#1E1E1E] shadow-2xl overflow-hidden relative mx-auto rounded-[54px]">
+        <!-- iPhone 状态栏 -->
+        <div class="w-full h-[47px] bg-black px-5 flex items-center justify-between text-white text-[14px] font-medium">
+            <div class="flex items-center space-x-1">
+                <!-- 信号图标 -->
+                <svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2 20h.01"></path>
+                    <path d="M7 20v-4"></path>
+                    <path d="M12 20v-8"></path>
+                    <path d="M17 20V8"></path>
+                    <path d="M22 4v16"></path>
+                </svg>
+                <span>中国移动</span>
+                <!-- WiFi图标 -->
+                <svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 20h.01"></path>
+                    <path d="M2 8.82a15 15 0 0 1 20 0"></path>
+                    <path d="M5 12.859a10 10 0 0 1 14 0"></path>
+                    <path d="M8.5 16.429a5 5 0 0 1 7 0"></path>
+                </svg>
+            </div>
+            <div class="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2">9:41</div>
+            <div class="flex items-center space-x-1">
+                <span>89%</span>
+                <!-- 电池图标 -->
+                <svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
+                    <rect height="10" rx="2" ry="2" width="16" x="2" y="7"></rect>
+                    <line x1="22" x2="22" y1="11" y2="13"></line>
+                </svg>
+            </div>
+        </div>
+
+        <!-- 动态岛 -->
+        <button class="absolute left-1/2 -translate-x-1/2 bg-black transition-all duration-300 ease-out w-[126px] h-[37.5px] -top-0.5 rounded-b-[24px]"></button>
+
+        <!-- 主内容区域 -->
+        <div class="w-full h-[calc(100%-47px)] bg-white overflow-hidden relative">
+            <!-- 滚动内容区域 -->
+            <div class="absolute inset-0 bottom-[84px] overflow-y-auto scrollbar-none">
+                <!-- 顶部导航栏 -->
+                <header class="bg-white border-b border-gray-200">
+                    <div class="flex items-center justify-between px-4 py-3">
+                        <a class="text-black" href="spaces.html">
+                            <i class="fas fa-arrow-left"></i>
+                        </a>
+                        <h1 class="text-sm font-medium text-black">我的项目</h1>
+                        <a class="text-black" href="#">
+                            <i class="fas fa-plus"></i>
+                        </a>
+                    </div>
+                </header>
+<!-- 项目状态筛选 -->
+<section class="bg-white px-4 py-3 sticky top-[94px] z-40">
+<div class="flex overflow-x-auto space-x-6 pb-2 no-scrollbar">
+<a class="whitespace-nowrap text-sm font-medium pb-1 border-b-2 border-black" href="#">全部</a>
+<a class="whitespace-nowrap text-sm text-gray-500 pb-1" href="#">进行中</a>
+<a class="whitespace-nowrap text-sm text-gray-500 pb-1" href="#">已完成</a>
+<a class="whitespace-nowrap text-sm text-gray-500 pb-1" href="#">已取消</a>
+</div>
+</section>
+<!-- 项目列表 -->
+<section class="px-4 py-4 space-y-4">
+<!-- 项目1 -->
+<a class="project-card block bg-white rounded-lg overflow-hidden shadow-sm" href="construction-project-detail.html">
+<div class="p-4">
+<div class="flex justify-between items-start mb-3">
+<h2 class="text-base font-semibold">现代简约风智能家居</h2>
+<span class="px-2 py-1 bg-black text-white text-xs rounded-full">进行中</span>
+</div>
+<div class="flex items-center text-sm text-gray-500 mb-2">
+<i class="fas fa-map-marker-alt mr-1"></i>
+<span>北京市朝阳区 · 120㎡ 三室两厅</span>
+</div>
+<div class="flex items-center text-sm text-gray-500 mb-3">
+<i class="fas fa-calendar-alt mr-1"></i>
+<span>开始时间: 2025-05-15</span>
+</div>
+<div class="mb-2">
+<div class="flex justify-between mb-1">
+<span class="text-xs font-medium">总体进度</span>
+<span class="text-xs">60%</span>
+</div>
+<div class="h-1.5 bg-gray-100 rounded-full">
+<div class="h-full bg-black rounded-full" style="width: 60%;"></div>
+</div>
+</div>
+<div class="flex justify-between items-center text-xs text-gray-500">
+<span>项目经理: 王工</span>
+<span>预计完成: 2025-06-20</span>
+</div>
+</div>
+</a>
+<!-- 项目2 -->
+<a class="project-card block bg-white rounded-lg overflow-hidden shadow-sm" href="construction-project-detail.html">
+<div class="p-4">
+<div class="flex justify-between items-start mb-3">
+<h2 class="text-base font-semibold">北欧风格智能家居</h2>
+<span class="px-2 py-1 bg-green-500 text-white text-xs rounded-full">已完成</span>
+</div>
+<div class="flex items-center text-sm text-gray-500 mb-2">
+<i class="fas fa-map-marker-alt mr-1"></i>
+<span>上海市浦东新区 · 89㎡ 两室一厅</span>
+</div>
+<div class="flex items-center text-sm text-gray-500 mb-3">
+<i class="fas fa-calendar-alt mr-1"></i>
+<span>开始时间: 2025-03-10</span>
+</div>
+<div class="mb-2">
+<div class="flex justify-between mb-1">
+<span class="text-xs font-medium">总体进度</span>
+<span class="text-xs">100%</span>
+</div>
+<div class="h-1.5 bg-gray-100 rounded-full">
+<div class="h-full bg-green-500 rounded-full" style="width: 100%;"></div>
+</div>
+</div>
+<div class="flex justify-between items-center text-xs text-gray-500">
+<span>项目经理: 李工</span>
+<span>完成时间: 2025-04-15</span>
+</div>
+</div>
+</a>
+<!-- 项目3 -->
+<a class="project-card block bg-white rounded-lg overflow-hidden shadow-sm" href="construction-project-detail.html">
+<div class="p-4">
+<div class="flex justify-between items-start mb-3">
+<h2 class="text-base font-semibold">日式风格智能家居</h2>
+<span class="px-2 py-1 bg-gray-500 text-white text-xs rounded-full">已取消</span>
+</div>
+<div class="flex items-center text-sm text-gray-500 mb-2">
+<i class="fas fa-map-marker-alt mr-1"></i>
+<span>广州市天河区 · 75㎡ 两室一厅</span>
+</div>
+<div class="flex items-center text-sm text-gray-500 mb-3">
+<i class="fas fa-calendar-alt mr-1"></i>
+<span>开始时间: 2025-02-20</span>
+</div>
+<div class="mb-2">
+<div class="flex justify-between mb-1">
+<span class="text-xs font-medium">总体进度</span>
+<span class="text-xs">30%</span>
+</div>
+<div class="h-1.5 bg-gray-100 rounded-full">
+<div class="h-full bg-gray-500 rounded-full" style="width: 30%;"></div>
+</div>
+</div>
+<div class="flex justify-between items-center text-xs text-gray-500">
+<span>项目经理: 张工</span>
+<span>取消时间: 2025-03-05</span>
+</div>
+</div>
+</a>
+</section>
+<!-- 创建新项目按钮 -->
+<section class="px-4 py-4">
+<button class="btn-primary w-full py-3 px-4 bg-black text-white rounded-lg font-medium text-center text-base hover:bg-gray-900 flex items-center justify-center">
+<i class="fas fa-plus mr-2"></i>
+                创建新项目
+            </button>
+                </section>
+            </div>
+
+            <!-- 底部导航栏 -->
+<div class="absolute bottom-0 left-0 right-0 h-[84px] bg-white/80 backdrop-blur-xl border-t border-white/20">
+<!-- 导航栏内容 -->
+<nav class="h-[49px] flex items-center px-2">
+<div class="flex justify-around w-full text-[12px]">
+<a class="flex flex-col items-center group text-gray-400 hover:text-gray-600 active:text-gray-800 transition-colors" href="home.html">
+<div class="transform transition-transform group-hover:scale-110 group-active:scale-95">
+<svg class="w-[22px] h-[22px] stroke-[1.5]" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+<polyline points="9 22 9 12 15 12 15 22"></polyline>
+</svg>
+</div>
+<span class="mt-1">首页</span>
+</a>
+<a class="flex flex-col items-center group text-gray-400 hover:text-gray-600 active:text-gray-800 transition-colors" href="design-result.html">
+<div class="transform transition-transform group-hover:scale-110 group-active:scale-95">
+<svg class="w-[22px] h-[22px] stroke-[1.5]" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+<circle cx="13.5" cy="6.5" fill="currentColor" r=".5"></circle>
+<circle cx="17.5" cy="10.5" fill="currentColor" r=".5"></circle>
+<circle cx="8.5" cy="7.5" fill="currentColor" r=".5"></circle>
+<circle cx="6.5" cy="12.5" fill="currentColor" r=".5"></circle>
+<path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"></path>
+</svg>
+</div>
+<span class="mt-1">设计</span>
+</a>
+<a class="flex flex-col items-center group text-gray-400 hover:text-gray-600 active:text-gray-800 transition-colors" href="mall.html">
+<div class="transform transition-transform group-hover:scale-110 group-active:scale-95">
+<svg class="w-[22px] h-[22px] stroke-[1.5]" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+<path d="M3 6h18"></path>
+<path d="M16 10a4 4 0 0 1-8 0"></path>
+</svg>
+</div>
+<span class="mt-1">商城</span>
+</a>
+<a class="flex flex-col items-center group text-black transition-colors" href="spaces.html" class="flex flex-col items-center group text-black transition-colors">
+<div class="transform transition-transform group-hover:scale-110 group-active:scale-95">
+<svg class="w-[22px] h-[22px] stroke-[1.5]" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="m15 12-8.373 8.373a1 1 0 1 1-3-3L12 9"></path>
+<path d="m18 15 4-4"></path>
+<path d="m21.5 11.5-1.914-1.914A2 2 0 0 1 19 8.172V7l-2.26-2.26a6 6 0 0 0-4.202-1.756L9 2.96l.92.82A6.18 6.18 0 0 1 12 8.4V10l2 2h1.172a2 2 0 0 1 1.414.586L18.5 14.5"></path>
+</svg>
+</div>
+<span class="mt-1">施工</span>
+</a>
+<a class="flex flex-col items-center group text-gray-400 hover:text-gray-600 active:text-gray-800 transition-colors" href="me.html">
+<div class="transform transition-transform group-hover:scale-110 group-active:scale-95">
+<svg class="w-[22px] h-[22px] stroke-[1.5]" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+<circle cx="12" cy="7" r="4"></circle>
+</svg>
+</div>
+<span class="mt-1">我的</span>
+</a>
+</div>
+</nav>
+<!-- iPhone 16 Home Indicator -->
+<div class="h-[34px] flex items-center justify-center">
+<div class="w-[134px] h-[5px] bg-black rounded-full"></div>
+</div>
+</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
